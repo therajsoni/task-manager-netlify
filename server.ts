@@ -101,8 +101,8 @@ app.prepare().then(() => {
           }
           socket.to(OnlineUsers.get(memberId)!).emit("message-container-from-new-message", {
             by: usernameSender, key: {
-              project: key.split("-")[0],
-              test: key.split("-")[1]
+              project: key.split("#$#")[0],
+              test: key.split("#$#")[1]
             },
           });
         }
@@ -237,7 +237,8 @@ app.prepare().then(() => {
     });
   });
 
-  httpServer.listen(process.env.APP_URL || "https://aonprojectmanagement.netlify.app", () => {
+  httpServer.listen(
+    process.env.APP_URL || "https://aonprojectmanagement.netlify.app", () => {
     console.log(`socket server`);
   });
 });

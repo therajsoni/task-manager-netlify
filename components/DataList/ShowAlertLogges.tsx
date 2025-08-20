@@ -25,11 +25,11 @@ export function AlertLogges({
         time: Date
     }[]>();
     const fetchAlertLogges = async () => {
-        const requests = await fetch("http://localhost:3001/getalllogs", {
-            method: "GET",
-        });
-        const response = await requests.json();
-        setLogges(response?.data);
+        // const requests = await fetch("http://localhost:3001/getalllogs", {
+        //     method: "GET",
+        // });
+        // const response = await requests.json();
+        // setLogges(response?.data);
     }
     useEffect(() => {
         fetchAlertLogges();

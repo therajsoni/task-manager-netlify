@@ -52,7 +52,7 @@ export default function ChatBox({ open, setOpen,
   }, []);
 
   const { data } = useRoleProvider();
-  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.name + "-" + selectedTask?.name : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?.name + "-" + selectedTask?.name : "";
+  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.name + "#$#" + selectedTask?.name : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?.name + "#$#" + selectedTask?.name : "";
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -101,6 +101,11 @@ export default function ChatBox({ open, setOpen,
     // }
 
 
+console.log({key,
+      message: trimmed,
+      senderId: data?._id,
+      usernameSender: data?.username
+    }, "details");
 
     socket.emit("message-container-in-send-message", {
       key,
@@ -108,6 +113,8 @@ export default function ChatBox({ open, setOpen,
       senderId: data?._id,
       usernameSender: data?.username
     });
+    
+
     setMessages((prev) => [...prev, newMessage])
     setInput("")
   }
@@ -135,6 +142,8 @@ export default function ChatBox({ open, setOpen,
       toast.error("Error occured while fetching the message of this task");
     }
     const response = await request.json();
+    console.log(response, "Response");
+    
     if (!response?.success) {
       toast.error(response?.message);
     }

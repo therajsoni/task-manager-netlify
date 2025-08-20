@@ -6,7 +6,7 @@ export const getSocket = ():Socket => {
     }
     console.log(socket, "socket");
     
-    socket = io("http://localhost:3001",{
+    socket = io(process.env.APP_URL,{
         autoConnect : false,
     })
 
