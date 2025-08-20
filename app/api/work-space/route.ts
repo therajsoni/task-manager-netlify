@@ -15,13 +15,13 @@ export async function GET() {
             return Response.json({
                 error: null, data: null, status: 404, success: false, message: "you id is mismatch in work space fetching time",
             })
-        }        
+        }
         if (!mongoose.isValidObjectId(decodeData?.id)) {
             return Response.json({
                 error: null, data: null, status: 404, success: false, message: "id is not valid",
             })
         }
-        const RegisterUser = await AllRegisterUser.findById(decodeData?.id).select("username");
+        const RegisterUser = await AllRegisterUser.findById(decodeData?.id);
         if (!RegisterUser) {
             return Response.json({
                 error: null, data: null, status: 404, success: false, message: "user not found by this id",
@@ -162,6 +162,29 @@ export async function GET() {
             }
         ];
         const projects = await ProjectModel.aggregate(pipeline);
+        console.log(projects
+            , " projects "
+        );
+
+        // update the data if project not find by project id then go Register field
+        if (projects[0]?.projectListData?.length === 0) {
+            const dataFormat = {
+                registration: {
+                    name: RegisterUser?.name, username: RegisterUser?.username, email: RegisterUser?.email, phone: RegisterUser?.phone, role: RegisterUser?.role, registrationDate: RegisterUser?.createdAt
+                },
+                totalData: {
+                    totalProjects: 0,
+                    completedProjects: 0,
+                    currentProjectsInRoled: 0,
+                    roles: null,
+                },
+                projectListData: []
+            }
+            return Response.json({
+                error: null, data: dataFormat, status: 200, success: true, message: "Data getted by Profile Register successfully",
+            })
+        }
+
         return Response.json({
             error: null, data: projects, status: 200, success: true, message: "Data getted successfully",
         })
