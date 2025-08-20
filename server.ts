@@ -237,7 +237,7 @@ app.prepare().then(() => {
     });
   });
 
-  httpServer.listen(process.env.APP_URL, () => {
+  httpServer.listen(process.env.APP_URL || "https://aonprojectmanagement.netlify.app", () => {
     console.log(`socket server`);
   });
 });
