@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "ES2017",
+    "outDir": "./dist",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": false,
+    "noEmit": true,
+        "allowImportingTsExtensions": true,
+  },
+  "include": ["server.ts", "models/**/*.ts", "actions/**/*.ts"]
+}
