@@ -180,8 +180,10 @@ export async function GET() {
                 },
                 projectListData: []
             }
+            console.log(dataFormat, "data formatted");
+            
             return Response.json({
-                error: null, data: dataFormat, status: 200, success: true, message: "Data getted by Profile Register successfully",
+                error: null, data: [dataFormat], status: 200, success: true, message: "Data getted by Profile Register successfully",
             })
         }
 

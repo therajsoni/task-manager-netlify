@@ -13,6 +13,7 @@ export default function EngineerProjectsPage() {
         myProjectsOverView,
         myProjectList,
     } = useWorkSpaceProvider();
+    
     const totalPages = Math.ceil(myProjectsOverView?.totalProjects?.length || 0 / itemsPerPage) + 1;
 return (
         <div className="p-6 space-y-6 overflow-y-scroll hide-scrollbar max-h-full">
@@ -71,19 +72,22 @@ return (
                 <CardContent className="grid grid-cols-4 gap-6">
                     <div>
                         <p className="text-sm text-muted-foreground">Projects Worked</p>
-                        <p className="text-lg font-bold">{myProjectsOverView?.completedProjects}</p>
+                        <p className="text-lg font-bold">{myProjectsOverView?.completedProjects === undefined ? 0 : myProjectsOverView?.completedProjects }</p>
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">Projects Working</p>
-                        <p className="text-lg font-bold">{myProjectsOverView?.currentProjectsInRoled}</p>
+                        <p className="text-lg font-bold">{myProjectsOverView?.currentProjectsInRoled === undefined  ? 0 : myProjectsOverView?.currentProjectsInRoled}</p>
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">Total Projects</p>
-                        <p className="text-lg font-bold">{myProjectsOverView?.totalProjects}</p>
+                        <p className="text-lg font-bold">{myProjectsOverView?.totalProjects === undefined ? 0 : myProjectsOverView?.totalProjects}</p>
                     </div>
                     <div>
                         <p className="text-sm text-muted-foreground">Roles</p>
                         <div className="flex gap-2 flex-wrap flex-col">
+                            {
+                                myProjectsOverView?.roles === null && <span className="font-bold">No Project provided</span>
+                            }
                             {myProjectsOverView?.roles?.map(role => (
                                 <span key={role}>{role}</span>
                             ))}
@@ -112,6 +116,10 @@ return (
                                     <TableCell>{new Date(project?.added).toLocaleString()}</TableCell>
                                 </TableRow>
                             ))}
+                            {
+                                myProjectList?.length === 0 && <h1 className="font-bold m-2 p-auto">No Project Assign Here!!</h1>
+                            }
+                            
                         </TableBody>
                     </Table>
                     <div className="flex justify-between items-center mt-4">
