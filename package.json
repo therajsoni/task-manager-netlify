@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev:next": "next dev",
     "dev:socket": "cross-env NODE_OPTIONS=\"--loader ts-node/esm --experimental-specifier-resolution=node --trace-warnings --no-warnings\" ts-node server.ts",
-    "build": "next build",
+    "dev": "concurrently \"npm run dev:next\" \"npm run dev:socket\"",
+    "build:next": "next build",
     "build:socket": "tsc --project tsconfig-server.json",
-    "start": "next start",
+    "build": "npm run build:next && npm run build:socket",
+    "start:next": "next start",
     "start:socket": "NODE_ENV=production node dist/server.mjs",
+    "start": "concurrently \"npm run start:next\" \"npm run start:socket\"",
     "lint": "next lint"
   },
   "dependencies": {
@@ -67,6 +70,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.0",
     "cross-env": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.1",
