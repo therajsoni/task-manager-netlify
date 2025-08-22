@@ -92,125 +92,149 @@ export async function POST(request: Request) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to P Manager</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+  <title>Welcome to PManager</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif; /* Use a modern font like Roboto. */
-      background-color: #e0f2f7; /* A lighter, more pleasant background color */
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh; /* Ensure the content is centered vertically */
+      padding: 0;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: #333;
     }
+
     .container {
-      max-width: 500px; /* Slightly adjusted max-width for better balance */
-      margin: 20px; /* Add some margin for smaller screens */
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 12px; /* Smoother border-radius */
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Enhanced shadow for depth */
-      text-align: center; /* Center the content within the container */
+      max-width: 600px;
+      margin: 40px auto;
+      background: linear-gradient(135deg, #2196f3, #21cbf3);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border : '1px solid black'
     }
-    h2 {
-      color: #2196f3; /* A vibrant blue for the heading */
-      margin-bottom: 20px;
-      font-size: 2.2em; /* Increase heading size */
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle text shadow */
+
+    .header {
+      background: linear-gradient(135deg, #2196f3, #21cbf3);
+      padding: 40px 20px;
+      text-align: center;
+      color: #fff;
     }
-    h2 span {
-        display: block;
-        font-size: 0.6em;
-        font-weight: normal;
-        color: #757575;
-        margin-top: 5px;
+
+    .header h2 {
+      margin: 0;
+      font-size: 2.2em;
+      font-weight: bold;
     }
-    p {
-      font-size: 1.1em;
-      line-height: 1.6; /* Improve readability with line-height */
+
+    .header span {
+      display: block;
+      margin-top: 8px;
+      font-size: 1em;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 35px 30px;
+      text-align: center;
+      line-height: 1.7;
+      background-color :linear-gradient(135deg, #2196f3, #21cbf3);
+    }
+
+    .content p {
       margin: 15px 0;
+      font-size: 1.05em;
+      color: #444;
     }
-    strong {
-      color: #424242;
+
+    .credentials {
+      border: 1px solid #dce7f1;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 25px 0;
+      text-align: left;
     }
-    .call-to-action {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #eeeeee;
+
+    .credentials p {
+      margin: 8px 0;
+      font-size: 1.05em;
     }
-    .call-to-action h3 {
-        color: #2196f3;
-        margin-bottom: 15px;
-        font-size: 1.5em;
+
+    .credentials strong {
+      color: #111;
     }
+
+    .cta {
+      margin-top: 25px;
+    }
+
     .btn {
       display: inline-block;
-      background-color: #2196f3;
-      color: #ffffff;
-      padding: 12px 25px;
-      border-radius: 6px;
-      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      background: white;
+      color: #fff;
       font-weight: bold;
-      transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
-      margin-top: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
     }
+
     .btn:hover {
-      background-color: #1976d2;
-      transform: translateY(-2px); /* Slight lift on hover */
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      background: blue;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      color : white;
     }
+
     .note {
       font-size: 0.95em;
-      color: #757575;
-      margin-top: 20px;
-      font-style: italic; /* Use italics for the note */
+      color: #666;
+      margin-top: 15px;
+      font-style: italic;
     }
-    img {
-      max-width: 100%;
-      height: auto;
-      margin-bottom: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Add a subtle shadow to the image */
+
+    .footer {
+      background: linear-gradient(135deg, #2196f3, #21cbf3);
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      color: #888;
     }
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .container {
-            margin: 15px;
-            padding: 30px;
-        }
-        h2 {
-            font-size: 2em;
-        }
-        p {
-            font-size: 1em;
-        }
-    }
-    @media (max-width: 480px) {
-        .container {
-            margin: 10px;
-            padding: 20px;
-        }
-        h2 {
-            font-size: 1.8em;
-        }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px;
+      }
+      .header h2 {
+        font-size: 1.8em;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Welcome to PManager 🎉<br><span>Your Project Management Journey Begins!</span></h2>
-    <p>Hi there! You've successfully registered and are ready to streamline your projects.</p>
-    <p>We've created a temporary account for you. Please use the following credentials to log in:</p>
-    <p><strong>Username:</strong> ${username}</p>
-    <p><strong>Password:</strong> ${password}</p>
-    
-    <div class="call-to-action">
-        <h3>Time to get started!</h3>
+    <div class="header">
+      <h2>Welcome to PManager 🎉</h2>
+      <span>Your Project Management Journey Begins!</span>
+    </div>
+
+    <div class="content">
+      <p>Hi there! You've successfully registered and are ready to streamline your projects.</p>
+      <p>We've created a temporary account for you. Please use the following credentials to log in:</p>
+      
+      <div class="credentials">
+        <p><strong>Username:</strong> ${username}</p>
+        <p><strong>Password:</strong> ${password}</p>
+      </div>
+
+      <div class="cta">
+        <a href=${process.env.APP_URL} target="_blank" class="btn">
+          Visit Your Dashboard Now
+        </a>
         <p class="note">This is a temporary password. For your security, please log in and change it immediately.</p>
-        <a href="https://aonprojectmanagement.netlify.app" target="_blank" class="btn">Visit Your Dashboard Now</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      © 2025 PManager — Manage smarter, not harder.
     </div>
   </div>
 </body>

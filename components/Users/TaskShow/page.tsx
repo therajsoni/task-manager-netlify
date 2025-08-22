@@ -191,7 +191,7 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
                 />
             }
             {
-               readmeDescription && <ReadMeMd open={readmeDescription} setOpen={setReadmeDescription} type=""
+               readmeDescription && <ReadMeMd open={readmeDescription} setOpen={setReadmeDescription} 
                     selectedTask={fetchTask}
                     projectDeatail={projectData}  />
             }

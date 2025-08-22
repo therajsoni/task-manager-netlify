@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import "jodit/es2021/jodit.min.css";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { singleProjectType, TaskList } from "@/types";
+import { Task } from "@/components/DataList/Tabs";
 
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
@@ -84,8 +86,10 @@ function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
 
 export default function ReadMeMd({
   selectedTask, tasks, open, setOpen, projectDeatail
-}: any) {
-  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.name + "#$#" + selectedTask?.name : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?.name + "#$#" + selectedTask?.name : "";
+}: {
+  selectedTask? :  undefined | TaskList | Task; tasks? : undefined | Task[]  ; open : boolean; setOpen : Dispatch<SetStateAction<boolean>>, projectDeatail? : singleProjectType | undefined
+}) {
+  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.id + "#$#" + selectedTask?.id : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?._id + "#$#" + selectedTask?.id : "";
 
   console.log();
   

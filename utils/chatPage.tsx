@@ -52,7 +52,7 @@ export default function ChatBox({ open, setOpen,
   }, []);
 
   const { data } = useRoleProvider();
-  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.name + "#$#" + selectedTask?.name : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?.name + "#$#" + selectedTask?.name : "";
+  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.id + "#$#" + selectedTask?.id : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?._id + "#$#" + selectedTask?.id : "";
 
   useEffect(() => {
     socket.on("connect", () => {

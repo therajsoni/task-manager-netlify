@@ -79,7 +79,7 @@ app.prepare().then(() => {
  
       // can be error occured here
       const sendTo = await ProjectModel.findOne({
-        name: key.split("#$#")[0]
+        _id: key.split("#$#")[0]
       });
 
       const membersName = sendTo?.group?.map((m: GroupMember) => m.member) || [];

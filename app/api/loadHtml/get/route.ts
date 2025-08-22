@@ -9,7 +9,6 @@ export async function POST(request: Request) {
         const find = await LoadHtmlModel.findOne({
             key: requestBody?.key, 
         }).populate("uploader", "username");
-        console.log(find, "find");
         
         return Response.json({
             error: null, message: 'html upload', status: 200, data: find, success: true,
