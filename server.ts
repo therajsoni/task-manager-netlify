@@ -76,10 +76,10 @@ app.prepare().then(() => {
 
     // handle Message Container
     socket.on("message-container-in-send-message", async ({ key, message, senderId, usernameSender }) => {
-
+ 
       // can be error occured here
       const sendTo = await ProjectModel.findOne({
-        name: key.split("-")[0]
+        name: key.split("#$#")[0]
       });
 
       const membersName = sendTo?.group?.map((m: GroupMember) => m.member) || [];
@@ -113,7 +113,6 @@ app.prepare().then(() => {
         message,
         senderId,
         "this is sender details"
-
       );
 
 
@@ -125,7 +124,7 @@ app.prepare().then(() => {
       });
 
       const messageDoc = await MessageConatainerData?.populate("senderId", "username");
-
+    
       // emit new message
       socket.emit("message-container-from-new-message", {
         by: messageDoc?.username,
@@ -238,7 +237,9 @@ app.prepare().then(() => {
   });
 
   httpServer.listen(
-    process.env.APP_URL || "https://aonprojectmanagement.netlify.app", () => {
+    process.env.APP_URL 
+    || "https://aonprojectmanagement.netlify.app"
+    , () => {
     console.log(`socket server`);
   });
 });

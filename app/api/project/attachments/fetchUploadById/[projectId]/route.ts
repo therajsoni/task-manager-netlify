@@ -1,32 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/actions/config";
-import ProjectModel from "@/models/projectModel";
+import AttachmentSchemaModel from "@/models/Attachments";
+import { NextResponse } from "next/server";
+
 
 export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ projectId: string }> }
+  req: Request,
+
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     await connectToDB();
-    const { projectId } = await context.params;
-
-    const project = await ProjectModel.findById(projectId).select("attachments");
-    if (!project) {
-      return NextResponse.json(
-        { success: false, message: "Project not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      attachments: project.attachments,
-    });
+    const projectId = (await params)?.projectId
+    const files = await AttachmentSchemaModel.find({ projectId }).populate("uploader", "username").sort({ createdAt: 1 });
+    console.log(files, "files");
+    
+    return NextResponse.json({ success: true, attachments: files });
   } catch (err) {
-    console.error("GET attachments error:", err);
-    return NextResponse.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: err, message : "Internal Server Error" }, { status: 500 });
   }
 }

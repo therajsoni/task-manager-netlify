@@ -7,6 +7,8 @@ const RegisterAllUser = new mongoose.Schema({
     phone : String,
     role : String,
     password : String,
+    // login time true and logout time false and also render it in Page
+    IamActiveByAdmin : Boolean,
 });
 
 const AllRegisterUser = mongoose.models.RegisterUsers || mongoose.model("RegisterUsers",RegisterAllUser);

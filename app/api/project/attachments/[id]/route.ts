@@ -1,84 +1,86 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
 import connectToDB from "@/actions/config";
-import ProjectModel from "@/models/projectModel";
+import AttachmentSchemaModel from "@/models/Attachments";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 
-type SavedFile = {
-  name: string;
-  url: string;
-  uploader: string;
-  date: Date;
-};
 export async function POST(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDB();
-    // fetch user
-    const cookie = cookies();
-    const token = (await cookie).get("token")?.value;
-    if (!token) {
-      return NextResponse.json({
-        success: false,
-        status: 404,
-        message: "Token not found",
-        error: null,
-        data: null
-      })
-    }
-    const details = await jwt.verify(token, process.env.secretKey || "nextapp");
-    if (typeof details === "string" || !("username" in details)) {
-      return NextResponse.json({
-        success: false,
-        message: "Invalid token",
-      });
-    } if (!details) {
-      return NextResponse.json({
-        success: false,
-        status: 404,
-        message: "Deatils not found",
-        error: null,
-        data: null
-      })
-    }
-
-    const { id } = await context.params;
     const formData = await req.formData();
     const files = formData.getAll("files") as File[];
-    if (!files || files.length === 0) {
-      return NextResponse.json({ success: false, message: "No files uploaded" }, { status: 400 });
+    // const uploader = "UserX"; // 🔹 replace with logged-in user name/email
+    const cookie = await cookies();
+    const id = cookie.get("token")?.value;
+    const uploadedFiles = [];
+    const projectId = (await params)?.id;
+    const { searchParams } = new URL(req.url);
+    const fileName = searchParams.get("fileName");
+    if (!id) {
+      return Response.json({
+        error: null, message: "You have invalid token", status: 403, data: null, success: false,
+      })
     }
-    // ✅ Ensure upload folder exists
-    const uploadDir = path.join(process.cwd(), "public", "uploadsFile");
-    await mkdir(uploadDir, { recursive: true });
-    const savedFiles: SavedFile[] = [];
+    const verifyToken = await jsonwebtoken.verify(id, process.env.secretkey!)
+    if (typeof verifyToken === "string") {
+      return Response.json({
+        error: null, message: "You have invalid token", status: 403, data: null, success: false,
+      })
+    }
+    type UploadedFile = {
+      public_id: string;
+      secure_url: string;
+      format: string;
+      resource_type: string;
+      bytes: number;
+      original_filename: string;
+    };
     for (const file of files) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filePath = path.join(uploadDir, file.name);
-      await writeFile(filePath, buffer);
-      savedFiles.push({
-        name: file.name,
-        url: `/uploadsFile/${file.name}`, // public URL
-        uploader: details?.username, // TODO: Replace with logged-in user
-        date: new Date(),
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const uploaded: UploadedFile = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+
+          { folder: `projects/${projectId}`, resource_type: "auto", },
+          (err, result) => {
+            if (err) return reject(err);
+            if (!result) return reject(new Error("Cloudinary upload failed, no result"));
+            resolve({
+              public_id: result.public_id,
+              secure_url: result.secure_url,
+              format: result.format,
+              resource_type: result.resource_type,
+              bytes: result.bytes,
+              original_filename: result.original_filename,
+            });
+          }
+        );
+        stream.end(buffer);
       });
+      // save metadata in MongoDB
+      const saved = await AttachmentSchemaModel.create({
+        projectId: projectId,
+        public_id: (uploaded).public_id,
+        secure_url: (uploaded).secure_url,
+        format: (uploaded).format,
+        resource_type: (uploaded).resource_type,
+        bytes: (uploaded).bytes,
+        original_filename: (uploaded).original_filename,
+        uploader: verifyToken?.id ?? null,
+        savedFileName: fileName,
+      });
+      uploadedFiles.push(saved);
     }
-    const project = await ProjectModel.findByIdAndUpdate(
-      id,
-      { $push: { attachments: { $each: savedFiles } } },
-      { new: true }
-    );
-    return NextResponse.json({
-      success: true,
-      message: "Files uploaded successfully",
-      project,
-    });
+
+    return NextResponse.json({ success: true, projectId: projectId, attachments: uploadedFiles });
   } catch (err) {
-    return NextResponse.json({ success: false, message: "Error occured server error" }, { status: 500 });
+    console.log(err, "error");
+
+    return NextResponse.json({ success: false, error: err, message: "Internal Server Error" }, { status: 500 });
   }
 }

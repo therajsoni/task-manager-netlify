@@ -1,66 +1,189 @@
 "use client";
-
-import { useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import "jodit/es2021/jodit.min.css";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { singleProjectType, TaskList, } from "@/types";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Upload, X } from "lucide-react";
+import toast from "react-hot-toast";
+
+
+const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
+/**
+* Props
+*/
+interface RTEProps {
+  value: string;
+  onChange: (html: string) => void;
+  placeholder?: string;
+}
+
+function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
+  const editorRef = useRef<any>(null);
+
+  const config = useMemo(
+    () => ({
+      readonly: false,
+      placeholder: placeholder ?? "Start typing…",
+      //    popup: {
+      //   zIndex: 3000,
+      //   defaultOffset: 0, // jitna chaho offset
+      // },
+      toolbarAdaptive: false,
+      // popup: {
+      //   adjustPosition: true, // popup ko anchor se chipkakar rakhega
+      // },
+      toolbarSticky: false,
+      askBeforePasteHTML: false,
+      askBeforePasteFromWord: false,
+      height: 300,
+      uploader: {
+        url: "/api/jodit/upload",
+        filesVariableName: () => "files",
+        prepareData(formData: FormData) {
+          return formData;
+        },
+        isSuccess(resp: any) {
+          return Boolean(resp && (resp.url || (resp.data && resp.data.url)));
+        },
+        process(resp: any) {
+          const url = resp.url || resp?.data?.url;
+          return {
+            files: url ? [url] : [],
+            path: url,
+            baseurl: "",
+            error: resp.error,
+            message: resp.message,
+          };
+        },
+        defaultHandlerSuccess(this: any, resp: any) {
+          const url = resp.url || resp?.data?.url;
+          if (url) this.s.insertImage(url);
+        },
+        error(e: any) {
+          console.error("Jodit upload error", e);
+        },
+      },
+    }),
+    [placeholder]
+  );
+
+  return (
+    <div className="bg-background shadow-sm overflow-hidden w-transparent rounded-xl border-b border-solid border-2">
+      <JoditEditor
+        ref={editorRef}
+        value={value}
+        config={config}
+        onBlur={(newContent: string) => onChange(newContent)}
+        onChange={() => { }}
+        className="hide-scrollbar"
+      />
+    </div>
+  );
+}
 
 export default function ReadMeMd({
-    open,
-    setOpen,
-    selectedTask,
-    tasks,
-    type,
-    projectDeatail,
-}: {
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    type?: string;
-    selectedTask?: Task | TaskList;
-    tasks?: Task[];
-    projectDeatail?: singleProjectType;
-}) {
-    const [content, setContent] = useState<string>(
-        `# Project ReadMe\n\nWrite documentation here...\n\n- Supports **Markdown**\n- Tables\n- Code blocks\n\n\`\`\`js\nconsole.log("Hello World")\n\`\`\``
-    );
+  selectedTask, tasks, open, setOpen, projectDeatail
+}: any) {
+  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.name + "#$#" + selectedTask?.name : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?.name + "#$#" + selectedTask?.name : "";
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen} >
-            <DialogContent>
-                <DialogHeader>Task MD</DialogHeader>
-                <Card className="w-full p-4">
-                    <Tabs defaultValue="write">
-                        <TabsList>
-                            <TabsTrigger value="write">Write</TabsTrigger>
-                            <TabsTrigger value="preview">Preview</TabsTrigger>
-                        </TabsList>
+  console.log();
+  
 
-                        {/* Write Mode */}
-                        <TabsContent value="write">
-                            <textarea
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                className="w-full h-64 border rounded-md p-2 font-mono text-sm"
-                                placeholder="Write your README in Markdown..."
-                            />
-                            <div className="flex justify-end mt-2">
-                                <Button onClick={() => setOpen(false)}>Save</Button>
-                            </div>
-                        </TabsContent>
+  const [value, setValue] = useState("");
+  const [lastTimeUpdatedBy, setLastTimeUpdatedBy] = useState("");
+  const [time, setTime] = useState<Date | null>();
+  useEffect(() => {
+    if (open === true) {
+      document.body.style.backgroundColor = 'gray'
+    }
+  }, [open])
+  const [loader, setLoader] = useState(false);
+  const handleUploadHtml = async () => {
+    setLoader(true);
+    const request = await fetch("/api/loadHtml/post", {
+      method: "POST",
+      headers: {
+        "ContentType": "application/json",
+      },
+      body: JSON.stringify({
+        key: key,
+        html: value
+      })
+    });
+    if (request.ok) {
+      const response = await request.json();
+      if (response.success) {
+        setValue(response?.data);
+        await LoadUploadHtml();
+        setLoader(false);
+      } else {
+        setLoader(false);
+        toast.error(response?.message);
+      }
+    } else {
+      setLoader(false);
+      toast.error("Some Error occured");
+    }
+  }
+  const LoadUploadHtml = async () => {
+    setLoader(true);
+    const request = await fetch("/api/loadHtml/get", {
+      method: "POST",
+      headers: {
+        "ContentType": "application/json",
+      },
+      body: JSON.stringify({
+        key: key
+      })
+    });
+    if (request.ok) {
+      const response = await request.json();
+      if (response.success) {
 
-                        {/* Preview Mode */}
-                        <TabsContent value="preview">
-                            <CardContent className="prose max-w-none dark:prose-invert">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-                            </CardContent>
-                        </TabsContent>
-                    </Tabs>
-                </Card>
-            </DialogContent>
-        </Dialog>
-    );
+        console.log(typeof response.data, response.data)
+        setValue(response?.data?.html);
+        setLastTimeUpdatedBy(response?.data?.updatedBy);
+        setTime(response?.data?.updatedAt);
+        setLoader(false);
+      } else {
+        setLoader(false);
+        toast.error(response?.message);
+      }
+    } else {
+      setLoader(false);
+      toast.error("Some Error occured");
+    }
+  }
+  useEffect(() => {
+    LoadUploadHtml();
+  }, [])
+  return (
+    <dialog open={open}
+      className={`z-100 border-2 border-solid border-black flex-col absolute ${open === true ? 'animate-in fade-in-0 zoom-out-95' : 'animate-out fade-out-0 zoom-in-95'} flex items-center justify-center m-auto   w-[60vw] rounded-xl  px-6  py-1 shadow-lg duration-200 top-5 bottom-5 max-h-[80vh] overflow-y-scroll hide-scrollbar`}
+    >
+      <div id="x-dialog-box" className="w-full flex justify-end mb-4">
+        <X onClick={() => setOpen(false)} />
+      </div>
+      {
+        lastTimeUpdatedBy &&
+        <p className="w-full flex justify-end mt-2 mb-2">
+          Last Time Updated By : <span className="text-bold font-sans ml-2 mt-.5">{lastTimeUpdatedBy ?? "Unknown"} at {time !== null && time !== undefined && new Date(time).toLocaleString()}</span>
+        </p>
+      }
+      <JoditEditorClient
+        value={value} onChange={setValue} placeholder=""
+      />
+      <div className="flex justify-end w-full mt-2">
+        <span onClick={() => {
+          if (!loader) {
+            handleUploadHtml()
+          }
+        }}>{
+            loader ? <Upload className="animate-spin" /> : "Upload"
+          }
+        </span>
+      </div>
+    </dialog>
+  );
 }

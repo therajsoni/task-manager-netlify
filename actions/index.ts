@@ -6,6 +6,7 @@ import ProjectModel from "@/models/projectModel";
 import { fallbackTaskModel } from "@/models/fallbackTaskModel";
 import AllRegisterUser from "@/models/RegisterAllUser";
 import { sendEmail } from "./email";
+import LoadHtmlModel from "@/models/LoadHtmlModel";
 
 export const loginUser = async (userData: {
   username: string;
@@ -53,6 +54,8 @@ export const loginUser = async (userData: {
         expiresIn: '5d',
       }
     );
+    checkUser.IamActiveByAdmin = true;
+    await checkUser.save();
     return {
       success: true,
       message: "Login successful",
@@ -84,11 +87,16 @@ export const checkIsUserHavaToken = async () => {
         if (isCheckTokenRelatedToApp) {
           if (typeof isCheckTokenRelatedToApp === "string" || !("identifier" in isCheckTokenRelatedToApp)) {
             return {
-              message: "Project Creator has invalid token",
+              message: "You have invalid token",
               success: false,
               status: 404,
               error: null,
             };
+          }
+          // also check that IamActiveByAdmin is true or not  
+          const IamActiveByAdmin = await AllRegisterUser.findById(isCheckTokenRelatedToApp?.id);
+          if (!IamActiveByAdmin || IamActiveByAdmin?.IamActiveByAdmin === false) {
+            return false;
           }
           return {
             status: true,
@@ -350,6 +358,7 @@ export const patchProjectByid = async (data: {
         error: null
       }
     }
+    const projectOldName = result?.name;
     if (data) {
       if (data.name) {
         result.name = data.name;
@@ -404,6 +413,20 @@ export const patchProjectByid = async (data: {
         }
       }
       const newData = await result.save();
+      // tasks description, Editor and proEditor both update, in task one field His
+      // editor task update 
+      if (data && data?.name) {
+        const editors = await LoadHtmlModel.find({}).select("key");
+        await Promise.all(
+          editors?.map(async (editorDoc) => {
+            const [projName, taskName] = editorDoc?.key?.split("#$#");
+            if (projName === projectOldName) {
+              editorDoc.key = `${newData?.name}#$#${taskName}`;
+              await editorDoc.save();
+            }
+          })
+        );
+      }
       return {
         message: "Data updated",
         status: 200,

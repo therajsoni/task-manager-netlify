@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,13 @@ export default function EngineerProjectsPage() {
         myregistrationDeatails,
         myProjectsOverView,
         myProjectList,
+        fetchData
     } = useWorkSpaceProvider();
+    console.log(myregistrationDeatails, myProjectsOverView, myProjectList, "Details - my");
     
+    useEffect(()=>{
+        fetchData();
+    },[])
     const totalPages = Math.ceil(myProjectsOverView?.totalProjects?.length || 0 / itemsPerPage) + 1;
 return (
         <div className="p-6 space-y-6 overflow-y-scroll hide-scrollbar max-h-full">

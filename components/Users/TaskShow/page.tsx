@@ -10,6 +10,7 @@ import ChatBox from "@/utils/chatPage";
 import { Task } from "@/components/DataList/Tabs";
 import ReadMeMd from "@/utils/DocUtils/ReadMeMd";
 
+
 export default function TaskShowSingleUser({ taskData, projectData }: { taskData: ProjectResponse | undefined, projectData: singleProjectType }) {
     if (taskData?.projectId !== projectData?._id || taskData?.data[0]?.id !== projectData?._id) {
         taskData = undefined
@@ -71,6 +72,7 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
         featureState, setFeatureState
     ] = useState(false);
     const [fetchTask, setFetchTask] = useState<TaskList | Task>();
+    const [readmeDescription,setReadmeDescription] = useState(false);
     const {
         loginrole,
 
@@ -106,12 +108,12 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
                         <TableHead>
                             Review
                         </TableHead>
-                        <TableHead>
-                            Chat
-                        </TableHead>
                         {/* <TableHead>
-                            Editor
+                            Chat
                         </TableHead> */}
+                        <TableHead>
+                            Editor
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -133,7 +135,7 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
                                         }}
                                     >Show</Button>
                                 </TableCell>
-                                <TableCell onClick={() => {
+                                {/* <TableCell onClick={() => {
                                     setOpenFeatures(
                                         true
                                     )
@@ -142,15 +144,16 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
                                     <Button>
                                         Chat
                                     </Button>
-                                </TableCell>
-                                {/* <TableCell onClick={() => {
-                                    setEditorOpen(true)
+                                </TableCell> */}
+                                 <TableCell onClick={() => {
+                                    setReadmeDescription(true)
                                     setFetchTask(item);
                                 }} >
                                     <Button>
-                                        Open
+                                        Editor
                                     </Button>
-                                </TableCell> */}
+                                </TableCell>
+
                             </TableRow>
                         )
                     })}
@@ -186,6 +189,11 @@ export default function TaskShowSingleUser({ taskData, projectData }: { taskData
                     selectedTask={fetchTask}
                     projectDeatail={projectData}
                 />
+            }
+            {
+               readmeDescription && <ReadMeMd open={readmeDescription} setOpen={setReadmeDescription} type=""
+                    selectedTask={fetchTask}
+                    projectDeatail={projectData}  />
             }
             {/* {
                 editorOpen && <ReadMeMd open={editorOpen} setOpen={setEditorOpen}

@@ -1,16 +1,9 @@
 import mongoose, { CallbackError } from "mongoose";
 // import LoginModel from "./loginModel";
 import AllRegisterUser from "./RegisterAllUser";
+import { AttachmentSchema } from "./Attachments";
 
-const AttachmentSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true }, // file name
-    url: { type: String, required: true },  // file storage url
-    uploader: { type: String, required: true }, // uploader name
-    date: { type: Date, default: Date.now },
-  },
-  { _id: false }
-);
+
 
 const ProjectSchema = new mongoose.Schema(
     {
@@ -77,9 +70,9 @@ const ProjectSchema = new mongoose.Schema(
         projectManager: {
             type: mongoose.Schema.Types.ObjectId,
             required: false,
-            ref : "RegisterUsers"
+            ref: "RegisterUsers"
         },
-        attachments : [AttachmentSchema]
+        attachments: [AttachmentSchema]
     },
     { timestamps: true }
 );
@@ -88,8 +81,8 @@ ProjectSchema.pre("save", async function (next) {
     if (this.isNew) {
         const findUser = await AllRegisterUser.findById(this.by);
         const findManager = await AllRegisterUser.findById(this.projectManager);
-        console.log(findUser,"90009");
-        console.log(findManager, "999999");       
+        console.log(findUser, "90009");
+        console.log(findManager, "999999");
         if (findUser) {
             this.group.push({
                 member: findUser.username,

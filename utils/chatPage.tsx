@@ -107,6 +107,7 @@ console.log({key,
       usernameSender: data?.username
     }, "details");
 
+    
     socket.emit("message-container-in-send-message", {
       key,
       message: trimmed,
@@ -114,7 +115,6 @@ console.log({key,
       usernameSender: data?.username
     });
     
-
     setMessages((prev) => [...prev, newMessage])
     setInput("")
   }

@@ -1,43 +1,44 @@
-// app/api/project/attachments/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { unlink } from "fs/promises";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
 import connectToDB from "@/actions/config";
-import ProjectModel from "@/models/projectModel";
+import AttachmentSchemaModel from "@/models/Attachments";
+
+
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params; // project id
     await connectToDB();
+
     const { searchParams } = new URL(req.url);
-    const fileName = searchParams.get("file"); // pass ?file=Invoice.png
-    if (!fileName) {
-      return NextResponse.json({ success: false, message: "File name missing" }, { status: 400 });
+    const public_id = searchParams.get("public_id");
+
+    if (!public_id) {
+      return NextResponse.json({ success: false, error: "File name required" }, { status: 400 });
     }
-    // remove from DB
-    const project = await ProjectModel.findByIdAndUpdate(
-      id,
-      { $pull: { attachments: { name: fileName } } },
-      { new: true }
-    );
-    if (!project) {
-      return NextResponse.json({ success: false, message: " not found" }, { status: 404 });
-    }
-    // remove from disk
-    const filePath = path.join(process.cwd(), "public", "uploadsFile", fileName);
-    try {
-      await unlink(filePath);
-    } catch (e) {
-      console.warn("File not found on disk, only DB entry removed");
-    }
-    return NextResponse.json({
-      success: true,
-      message: "Attachment deleted successfully",
-      project,
+
+    const projectId = (await params)?.id
+
+    const file = await AttachmentSchemaModel.findOne({
+      projectId,
+      public_id,
     });
+
+    if (!file) {
+      return NextResponse.json({ success: false, error: "File not found" }, { status: 404 });
+    }
+
+    // delete from Cloudinary
+    await cloudinary.uploader.destroy(public_id);
+
+    // delete from DB
+    await AttachmentSchemaModel.deleteOne({ _id: file._id });
+
+    const remaining = await AttachmentSchemaModel.find({ projectId });
+
+    return NextResponse.json({ success: true, project: { _id: projectId, attachments: remaining } });
   } catch (err) {
-    return NextResponse.json({ success: false, message: "not getted attachements" }, { status: 500 });
+    return NextResponse.json({ success: false, error: err, message : "Internal Server Error" }, { status: 500 });
   }
 }

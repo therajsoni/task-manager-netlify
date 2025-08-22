@@ -7,13 +7,14 @@ import FallBackShowStatus from "./FallBackShowStatus";
 import UpdateProjectDetails from "../UpdateProjectDetails";
 import { Label } from "../ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { AlertCircle, Plus, RotateCw, Upload, View } from "lucide-react";
+import { AlertCircle, EditIcon, Plus, RotateCw, Upload, View } from "lucide-react";
 import { singleProjectType } from "@/types";
 import { AlertLogges } from "./ShowAlertLogges";
 import { useRoleProvider } from "@/utils/roleProviderContext";
 import TaskEditor from "../DictinoryBox/TaskDescribeDetailBox";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import ViewGraphs from "@/utils/DocUtils/ViewGraphs";
+import ReadMeMd from "@/utils/DocUtils/ReadMeMd";
 // import AlertPage from "../AlertPage";
 // import AlertPage from "../AlertPage";
 export default function HomeDataListPage({ username, userData, identifier, actionCreateUpdate, clickProjectData, toggleActionCreateUpdateFn, setActionCreateUpdate
@@ -58,6 +59,8 @@ export default function HomeDataListPage({ username, userData, identifier, actio
         UserGlobalData,
         clickProjectData?.name
     ]);
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
+
     function onClose() {
         setIsOpen((prev: boolean) => !prev);
     }
@@ -86,9 +89,7 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                                     setIsOpen((prev: boolean) => !prev);
                                                 }}
                                             >
-                                                <button>
                                                     <Plus />
-                                                </button>
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -103,9 +104,7 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                                 setUpdateProjectData(true);
                                             }}
                                         >
-                                            <button>
                                                 <RotateCw />
-                                            </button>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -126,37 +125,47 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                 {/* {uploadBoxKeyBoardDown && <span>
                                         Upload project files
                                     </span>} */}
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                        <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
+
+                                        >
+                                                <EditIcon onClick={() => {
+                                                    setIsEditorOpen(true);
+                                                }} />
+                                        </div>        
+                                        </TooltipTrigger>
+                                                                            <TooltipContent>
+                                        ProEditor
+                                    </TooltipContent>
+                                    </Tooltip>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
 
                                         >
-                                            <button>
                                                 <Upload onClick={() => {
                                                     setUploadBoxOpen(true);
                                                 }} />
-                                            </button>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         Add Attachments
                                     </TooltipContent>
                                 </Tooltip>
-                                <Tooltip>
+                                {/* <Tooltip>
                                     <TooltipTrigger>
                                         <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
                                         >
-                                            <button>
                                                 <View onClick={() => {
                                                     setViewGraphs(true);
                                                 }} />
-                                            </button>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         View Graphs
                                     </TooltipContent>
-                                </Tooltip>
+                                </Tooltip> */}
                                 {/* <Tooltip>
                                     <TooltipTrigger>
                                               <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
@@ -220,6 +229,9 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                         // clickProjectData={clickProjectData}
                          />
                 </>
+            }
+            {
+                isEditorOpen && <ReadMeMd selectedTask={undefined} tasks={undefined} open={isEditorOpen} setOpen={setIsEditorOpen} projectDeatail={clickProjectData}/>
             }
             {/* {
                 stateAlert && <>

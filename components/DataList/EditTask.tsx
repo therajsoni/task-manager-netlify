@@ -28,11 +28,13 @@ export default function EditTaskModal({ open, setOpen, onSave, initialTasks, typ
     const hasAnyChild = (task: Task) => {
         return task?.children && task?.children?.length > 0;
     };
+    const [oldName] = useState(selectedTask?.name);
     const [name, setName] = useState(selectedTask?.name);
     const [responsibility, setResponsibility] = useState(selectedTask?.responsibility);
     const [status, setStatus] = useState(selectedTask?.status);
     const [description, setDescription] = useState(selectedTask?.description || "");
     const [listOfResponsive, setListOfResponsive] = useState<string[]>([]);
+    const [updateNameField, setUpdateNameField] = useState(false);
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedTask) return;
@@ -92,7 +94,9 @@ export default function EditTaskModal({ open, setOpen, onSave, initialTasks, typ
                 </DialogHeader>
                 <form onSubmit={(e: FormEvent<HTMLFormElement>) => handleSubmit(e)} className="space-y-4">
                     <Label>Task Name</Label>
-                    <Input name="name" className={`${type === "show" ? "cursor-not-allowed" : ""} border-black border-1`} disabled={type !== "edit"} placeholder="Task Name" value={name ?? selectedTask?.name} onChange={(e) => setName(e.target.value)} />
+                    <Input name="name" className={`${type === "show" ? "cursor-not-allowed" : ""} border-black border-1`} disabled={type !== "edit"} placeholder="Task Name" value={name ?? selectedTask?.name} onChange={(e) => {
+                        setUpdateNameField(true);
+                        setName(e.target.value)}} />
                     <Label>{type === "show" ? "Show Responsible Person" : "Select Responsible Persons"}</Label>
                     <Select disabled={type !== "edit"} value={responsibility}
                         onValueChange={value => {

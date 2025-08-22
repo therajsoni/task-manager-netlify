@@ -341,7 +341,7 @@ export default function AdminPage() {
                 }}>
                     Manage Projects
                 </Button>
-                <Button onClick={() => {
+                {/* <Button onClick={() => {
                     setSelectedTabs({
                         users: false,
                         projects: false,
@@ -349,7 +349,7 @@ export default function AdminPage() {
                     })
                 }}>
                     User With Projects
-                </Button>
+                </Button> */}
                 {selectedTabs.userWithProjects !== true && <Popover>
                     <PopoverTrigger asChild>
                         <Button className="bg-black hover:bg-black text-gray-200">

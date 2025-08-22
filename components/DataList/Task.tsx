@@ -62,7 +62,7 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
   const [typeOpen, setTypeOpen] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | undefined>();
   const [fetchTaskName, setFetchTaskName] = useState("");
-  const [docFeature,setDocFeature] = useState(false);
+  const [docFeature, setDocFeature] = useState(false);
   const [showDeatilsDescription, setShowDetailsDescription] = useState({
     open: false, value: "",
   });
@@ -141,8 +141,20 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
   };
   const handleSave = async (updatedTask: Task) => {
     const updatedTasks = updateTaskById(tasks, updatedTask?.id, updatedTask);
+    // if (selectedTask?.name !== updatedTask?.name) {
+    //   alert(selectedTask?.name + "," + initialTasks[0]?.name + "," + updatedTask?.name);
+    //   const key = initialTasks[0]?.name + "#$#" + selectedTask?.name;
+    //   await fetch("/api/loadHtml/updateLoadHtmlKeyWhenChangeTaskName", {
+    //     method: "POST",
+    //     body: JSON.stringify({
+    //       key,
+    //       Name: updatedTask?.name
+    //     }),
+    //   });
+    // }
     setTasks(updatedTasks);
     await handleSaveChanges(updatedTasks)
+
   };
   const renderRows = (rows: Task[], level: number = 0, parentChildren: Task[] | null = null): JSX.Element[] => {
     if (!Array.isArray(rows)) return [];
@@ -251,16 +263,16 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
                           </div>
                         </>
                       }
-                      <div className="flex flex-row items-center justify-start">
+                      {/* <div className="flex flex-row items-center justify-start">
                         <Button onClick={() => {
                           setFeatures(true);
                         }} className="w-[100px] text-sm flex justify-around items-center  bg-gray-100 text-black hover:bg-gray-200 hover:text-black" >Chat <FileArchive /> </Button>
 
-                      </div>
-                                            <div className="flex flex-row items-center justify-start">
+                      </div> */}
+                      <div className="flex flex-row items-center justify-start">
                         <Button onClick={() => {
                           setDocFeature(true);
-                        }} className="w-[100px] text-sm flex justify-around items-center  bg-gray-100 text-black hover:bg-gray-200 hover:text-black" >Task <DockIcon /> </Button>
+                        }} className="w-[100px] text-sm flex justify-around items-center  bg-gray-100 text-black hover:bg-gray-200 hover:text-black" >Editor <DockIcon /> </Button>
                       </div>
                     </div>
                   </div>
@@ -269,14 +281,14 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
             </div>
           </TableCell>}
           {
-            task?.name === initialTasks[0]?.name && <div className="flex justify-start items-center gap-4 mb-2">
+            task?.id === initialTasks[0]?.id && <div className="flex justify-start items-center gap-4 mb-2">
               <Tooltip>
                 <TooltipTrigger>
                   <Popover>
                     <PopoverTrigger className="flex justify-start items-center gap-5">
-                      <button>
-                        <Plus size={32} className="bg-black text-white" />
-                      </button>
+<button>
+                      <Plus size={32} className="bg-black text-white" />
+                   </button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[150px]">
                       <div className="flex justify-center items-center flex-col gap-2">
@@ -332,11 +344,11 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
                                   </AlertDialogContent>
                                 </AlertDialog>
                               </div>
-                          <div className="flex flex-row items-center justify-start">
-                            <Button onClick={() => {
-                              setFeatures(true);
-                            }} className="w-[100px] text-sm flex justify-around items-center  bg-gray-100 text-black hover:bg-gray-200 hover:text-black" >Chat <FileArchive /> </Button>
-                          </div>
+                              {/* <div className="flex flex-row items-center justify-start">
+                                <Button onClick={() => {
+                                  setFeatures(true);
+                                }} className="w-[100px] text-sm flex justify-around items-center  bg-gray-100 text-black hover:bg-gray-200 hover:text-black" >Chat <FileArchive /> </Button>
+                              </div> */}
                             </>
                           }
                         </div>
@@ -416,7 +428,10 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
         features && <ChatBox type={"group"} selectedTask={selectedTask} tasks={tasks} open={features} setOpen={setFeatures} />
       }
       {
-        docFeature && <ReadMeMd selectedTask={selectedTask} tasks={tasks} open={docFeature} setOpen={setDocFeature} />
+        docFeature && <ReadMeMd
+          project={tasks}
+          selectedTask={selectedTask} tasks={tasks} open={docFeature} setOpen={setDocFeature}
+        />
       }
       {
         showDeatilsDescription && <Dialog open={showDeatilsDescription.open} onOpenChange={() => {
