@@ -57,7 +57,7 @@ export const loginUser = async (userData: {
     checkUser.IamActiveByAdmin = true;
     await checkUser.save();
     await sendEmail({
-      to : checkUser?.email,subject : "Login Successfully", text : `you logged in our ${process.env.APP_URL}`, html : `
+      to: checkUser?.email, subject: "Login Successfully", text: `you logged in our ${process.env.APP_URL}`, html: `
       <!DOCTYPE html>
 <html lang="en">
 <head>

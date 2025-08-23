@@ -10,7 +10,8 @@ export const AttachmentSchema = new mongoose.Schema(
         bytes: { type: Number },
         original_filename: { type: String },
         uploader: { type: mongoose.Schema.Types.ObjectId, ref : "RegisterUsers" },
-        savedFileName : String
+        savedFileName : String,
+        preview_url : String
     }
 );
 

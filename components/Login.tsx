@@ -40,7 +40,7 @@ export default function LoginComponent() {
         window.location.reload();
       }
       else {
-        // toast.error(res?.message);
+        toast.error(res?.message);
         setData({
           username: "",
           password: ""

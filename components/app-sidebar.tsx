@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Command, Eye, Inbox, Loader, Lock, Stethoscope, Trash2, UserLock, PersonStanding, AlignVerticalSpaceAround, PersonStandingIcon, Workflow } from "lucide-react"
+import { Command, Eye, Inbox, Loader, Lock, Stethoscope, Trash2, UserLock, PersonStanding, AlignVerticalSpaceAround, PersonStandingIcon, Workflow, LoaderIcon } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
 import { Label } from "@/components/ui/label"
@@ -125,7 +125,9 @@ export function AppSidebar({
     }
   }
 
+  const [loadingLogout, setLoadingLogout] = React.useState(false);
   const submitLogOut = async () => {
+    setLoadingLogout(true);
     const request = await fetch("/api/logout", {
       method: "GET",
     });
@@ -133,11 +135,14 @@ export function AppSidebar({
       const response = await request.json();
       if (response?.success) {
         toast.success("SuccessFully Logout");
+        setLoadingLogout(false)
         window.location.reload();
       } else {
+        setLoadingLogout(false)
         toast.error(response?.message);
       }
     } else {
+      setLoadingLogout(false)
       toast.error('Some Error Occured');
     }
   }
@@ -385,6 +390,7 @@ export function AppSidebar({
       {
         profileShow && <ProfileDialog
           fn={submitLogOut} open={profileShow} onClose={setProfileShow} data={userDetails}
+          loadingLogout={loadingLogout}
         />
       }
 
@@ -393,7 +399,7 @@ export function AppSidebar({
   )
 }
 
-const ProfileDialog = ({ data, fn, open, onClose }: {
+const ProfileDialog = ({ data, fn, open, onClose, loadingLogout }: {
   data: {
     username: string,
     password: string,
@@ -401,7 +407,8 @@ const ProfileDialog = ({ data, fn, open, onClose }: {
   },
   fn: () => void,
   open: boolean,
-  onClose: React.Dispatch<React.SetStateAction<boolean>>
+  onClose: React.Dispatch<React.SetStateAction<boolean>>,
+  loadingLogout : boolean
 }) => {
   const [loading, setLoading] = React.useState(false);
   const [details, setDetails] = React.useState<{
@@ -521,9 +528,11 @@ const ProfileDialog = ({ data, fn, open, onClose }: {
                 setIsUpdateClick((prev) => !prev);
               }} className="bg-black text-white font-medium">{loading ? <Loader className="animate-spin" /> : <>Update password<Lock /> </>}</Button>
             }
-            <Button onClick={() => {
+            <Button disabled={loadingLogout} onClick={() => {
               fn();
-            }}>Logout  <Trash2 /></Button>
+            }}>{
+            loadingLogout ? <LoaderIcon className="animate-spin"/> : <>Logout  <Trash2 /></>
+            }</Button>
           </div>
         </div>
       </DialogContent>

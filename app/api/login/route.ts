@@ -2,7 +2,7 @@ import { loginUser } from "@/actions";
 import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
-        const body = await request?.json();
+    const body = await request?.json();
     const { username, password } = body;
     if (!username || !password) {
       return NextResponse.json({
@@ -17,6 +17,8 @@ export async function POST(request: Request) {
         status: response.status,
       });
     }
+    console.log(response, "Response");
+
     if (response !== undefined && response.success) {
       const token = response?.token;
       const responseStack = NextResponse.json({
@@ -32,6 +34,6 @@ export async function POST(request: Request) {
       return responseStack;
     }
   } catch (error) {
-    return NextResponse.json({ message: "Internal Server Error", status: 500 , error });
+    return NextResponse.json({ message: "Internal Server Error", status: 500, error });
   }
 }

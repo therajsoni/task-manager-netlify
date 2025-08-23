@@ -33,11 +33,12 @@ type AttachmentType = {
   resource_type: string;
   date?: Date; // optional if backend doesn't send
   savedFileName: string;
-  uploader : {
-    _id : string,
-    username : string,
+  uploader: {
+    _id: string,
+    username: string,
   },
-  createdAt : Date
+  createdAt: Date,
+  preview_url: string
 };
 
 
@@ -127,7 +128,7 @@ export default function TaskEditor({
       const res = await fetch(`/api/project/attachments/fetchUploadById/${clickProjectData?._id}`);
       const result = await res.json();
       if (result.success) {
-        const mapped = result.attachments.map((a:AttachmentType) => ({
+        const mapped = result.attachments.map((a: AttachmentType) => ({
           _id: a._id,
           public_id: a.public_id,
           secure_url: a.secure_url,
@@ -137,7 +138,8 @@ export default function TaskEditor({
           resource_type: a.resource_type,
           date: a.createdAt ? new Date(a.createdAt) : new Date(), // fallback
           savedFileName: a?.savedFileName || "Unknow Name",
-          uploader : a?.uploader || {}
+          uploader: a?.uploader || {},
+          preview_url: a?.preview_url,
         }));
         setData(mapped);
 
@@ -183,7 +185,7 @@ export default function TaskEditor({
   const [selectImage, setSelectImage] = React.useState("");
 
   console.log(data, "setdata");
-  
+
 
   return (
     <>
@@ -272,7 +274,7 @@ export default function TaskEditor({
                       <TableCell onClick={() => setSelectedDoc(item)}>
                         {NameLengthManage(item?.savedFileName, 22) || "Unknow Name"}
                       </TableCell>
-                      <TableCell>{NameLengthManage(item?.uploader?.username,12)}</TableCell>
+                      <TableCell>{NameLengthManage(item?.uploader?.username, 12)}</TableCell>
                       <TableCell>{item.date ? new Date(item.date).toLocaleString() : "--"}</TableCell>
                       <TableCell className="flex flex-row  mt-1 gap-3">
                         <Eye onClick={(e) => {
@@ -341,6 +343,14 @@ export default function TaskEditor({
                       >
                         {" Download"}
                       </a>
+                      {/* <a
+                        href={selectedDoc?.preview_url}
+
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        {" Preview"}
+                      </a> */}
+
                     </button>
                   </div>
                 )}

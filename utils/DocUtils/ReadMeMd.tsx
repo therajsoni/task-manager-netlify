@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import "jodit/es2021/jodit.min.css";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
+import { Loader, Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { singleProjectType, TaskList } from "@/types";
 import { Task } from "@/components/DataList/Tabs";
@@ -35,6 +35,7 @@ function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
       // popup: {
       //   adjustPosition: true, // popup ko anchor se chipkakar rakhega
       // },
+      removeButtons: ["image", "video"],
       toolbarSticky: false,
       askBeforePasteHTML: false,
       askBeforePasteFromWord: false,
@@ -58,13 +59,28 @@ function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
             message: resp.message,
           };
         },
-        defaultHandlerSuccess(this: any, resp: any) {
-          const url = resp.url || resp?.data?.url;
-          if (url) this.s.insertImage(url);
-        },
-        error(e: any) {
-          console.error("Jodit upload error", e);
-        },
+         defaultHandlerSuccess(this: any, resp: any) {
+      if (resp?.files?.length) {
+        console.log(resp?.files, "files");
+      resp.files.forEach((file: any) => {
+        if (file?.type === "image") {
+          // ✅ insert image
+          this.s.insertImage(file?.url);
+        } else if (file.type.startsWith("video")) {
+          // ✅ insert video
+          this.s.insertHTML(`<video controls src="${file?.url}" style="max-width:100%"></video>`);
+        } else {
+          // ✅ insert pdf/doc as link
+          this.s.insertHTML(`<a href="${file?.url}" target="_blank">${file?.url}</a>`);
+        }
+      });
+    } else if (resp.url) {
+      // fallback for single image
+      this.s.insertImage(resp.url);
+    }  },
+  error(e: any) {
+    console.error("Jodit upload error", e);
+  },
       },
     }),
     [placeholder]
@@ -91,17 +107,11 @@ export default function ReadMeMd({
 }) {
   const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.id + "#$#" + selectedTask?.id : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?._id + "#$#" + selectedTask?.id : "";
 
-  console.log();
-  
 
   const [value, setValue] = useState("");
   const [lastTimeUpdatedBy, setLastTimeUpdatedBy] = useState("");
   const [time, setTime] = useState<Date | null>();
-  useEffect(() => {
-    if (open === true) {
-      document.body.style.backgroundColor = 'gray'
-    }
-  }, [open])
+  
   const [loader, setLoader] = useState(false);
   const handleUploadHtml = async () => {
     setLoader(true);
@@ -162,9 +172,14 @@ export default function ReadMeMd({
   useEffect(() => {
     LoadUploadHtml();
   }, [])
+  
   return (
+    <>
+    {open && (
+  <div className="fixed inset-0  z-50 bg-black/50"></div>
+)}
     <dialog open={open}
-      className={`z-100 border-2 border-solid border-black flex-col absolute ${open === true ? 'animate-in fade-in-0 zoom-out-95' : 'animate-out fade-out-0 zoom-in-95'} flex items-center justify-center m-auto   w-[60vw] rounded-xl  px-6  py-1 shadow-lg duration-200 top-5 bottom-5 max-h-[80vh] overflow-y-scroll hide-scrollbar`}
+      className={`z-100  flex-col absolute ${open === true ? 'animate-in fade-in-0 zoom-out-95' : 'animate-out fade-out-0 zoom-in-95'} flex items-center justify-center m-auto   w-[60vw] rounded-xl  px-6  shadow-lg duration-200 top-5 bottom-5 max-h-[80vh] overflow-y-scroll hide-scrollbar py-4`}
     >
       <div id="x-dialog-box" className="w-full flex justify-end mb-4">
         <X onClick={() => setOpen(false)} />
@@ -178,16 +193,17 @@ export default function ReadMeMd({
       <JoditEditorClient
         value={value} onChange={setValue} placeholder=""
       />
-      <div className="flex justify-end w-full mt-2">
+      <div className="flex justify-end w-full mt-4">
         <span onClick={() => {
           if (!loader) {
             handleUploadHtml()
           }
         }}>{
-            loader ? <Upload className="animate-spin" /> : "Upload"
+            loader ? <Loader className="animate-spin" /> : <Upload />
           }
         </span>
       </div>
     </dialog>
+    </>
   );
 }

@@ -402,7 +402,7 @@ export default function TaskTable({ userData, tasks, setTasks, projectId, setPro
   };
   return (
     <>
-      <div className="overflow-x-auto ">
+      <div className="overflow-x-auto">
         <Table className="min-w-full text-sm text-left text-gray-800">
           <tbody
           >{renderRows(tasks)}</tbody>

@@ -62,7 +62,8 @@ export async function POST(
         );
         stream.end(buffer);
       });
-      // save metadata in MongoDB
+      const previewUrl = uploaded.secure_url.replace("/upload/", "/upload/fl_inline/");
+            // save metadata in MongoDB
       const saved = await AttachmentSchemaModel.create({
         projectId: projectId,
         public_id: (uploaded).public_id,
@@ -73,6 +74,7 @@ export async function POST(
         original_filename: (uploaded).original_filename,
         uploader: verifyToken?.id ?? null,
         savedFileName: fileName,
+        preview_url: previewUrl,   
       });
       uploadedFiles.push(saved);
     }

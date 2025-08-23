@@ -10,18 +10,16 @@ export async function POST(request: Request) {
         const cookie = await cookies();
         const data = cookie.get("token")?.value;
         if (!data) {
-        return Response.json({
-            error : null, message: "You have invalid token", status: 403, data: null, success: false,
-        })
+            return Response.json({
+                error: null, message: "You have invalid token", status: 403, data: null, success: false,
+            })
         }
-
-        const verifyToken = await jsonwebtoken.verify(data,process.env.secretkey!)
+        const verifyToken = await jsonwebtoken.verify(data, process.env.secretkey!)
         if (typeof verifyToken === "string") {
-          return Response.json({
-            error : null, message: "You have invalid token", status: 403, data: null, success: false,
-        })  
+            return Response.json({
+                error: null, message: "You have invalid token", status: 403, data: null, success: false,
+            })
         }
-            
         if (!(requestBody?.key && requestBody?.html)) {
             return Response.json({
                 error: null, message: 'Missing fields', status: 400, data: null, success: false,
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
                 key: requestBody?.key,
                 html: requestBody?.html,
                 uploader: verifyToken?.id,
-                updatedBy : verifyToken?.username,
+                updatedBy: verifyToken?.username,
             });
         }
         return Response.json({

@@ -170,7 +170,7 @@ export default function CustomTabs({ data, identifier
     }, [loginrole, UserGlobalData, data?.name]);
 
     return (
-        <div className="flex w-full p-5 flex-col ">
+        <div className="flex w-full p-5 flex-col">
 
             <Tabs defaultValue="users">
                 <TabsList className="flex-1 px-2 py-2  w-full">
@@ -183,7 +183,7 @@ export default function CustomTabs({ data, identifier
                     <TaskShowSingleUser projectData={data} taskData={taskData} />
                 </TabsContent>
                 {
-                    (loginrole === "core-admin" || projectrole === "core-admin") && <TabsContent value="tasks">
+                    (loginrole === "core-admin" || projectrole === "core-admin") && <TabsContent value="tasks" className="scroll-y-scroll max-h-[50vh] hide-scrollbar">
                         <div className="relative group inline-block cursor-pointer">
                         </div>
                         {

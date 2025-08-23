@@ -183,7 +183,7 @@ export default function AdminPage() {
                 return toast.error("Enter valid phone number");
             }
         }
-    const updateAnyUserByData = await fetch("/api/admin/register/update", {
+        const updateAnyUserByData = await fetch("/api/admin/register/update", {
             method: "PATCH",
             body: JSON.stringify({
                 data: updateAnyUser
@@ -307,9 +307,9 @@ export default function AdminPage() {
         )
         : projects;
     return (
-        <div className="p-6">
+        <div className="p-6 overflow-y-scroll hide-scrollbar">
             <h1 className="text-2xl font-bold mb-6">Hello, Admin</h1>
-            <section className="mb-4 flex items-center gap-4">
+            <section className="mb-4 flex items-center gap-4 overflow-y-scroll hide-scrollbar">
                 <Link href={"/"} className='text-white bg-black px-4 py-2 rounded-lg'>Back</Link>
                 <Button
                     className="bg-black hover:bg-black text-gray-200"
@@ -382,95 +382,96 @@ export default function AdminPage() {
                 </Popover>}
             </section>
             <main className="overflow-x-auto">
-                <h1 className='font-bold text-3xl py-2 px-0 underline text-blue-500'>
+                <h1 className='font-bold text-3xl py-2 px-0 underline text-blue-500 '>
                     {
                         (selectedTabs.users === true && selectedTabs.projects === false) ? "All User's" : selectedTabs.projects ? "All Project's" : "All Project's with User's"
                     }
                 </h1>
-                <Table>
-                    <TableHeader>
-                        {
-                            selectedTabs.users === true && selectedTabs.projects === false &&
-                            <TableRow>
-                                <TableHead>No</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Username</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Password</TableHead>
-                                <TableHead>Phone</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead className='w-1 '>Update </TableHead>
-                                <TableHead></TableHead>
-                                <TableHead>DELETE</TableHead>
-                            </TableRow>
-                        }
-                        {
-                            selectedTabs.users === false && selectedTabs.projects === true &&
-                            <TableRow className='text-lg p-2 m-4'>
-                                <TableHead>No</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Client</TableHead>
-                                <TableHead>Creator</TableHead>
-                                <TableHead>Project Manager</TableHead>
-                                <TableHead>Create Date</TableHead>
-                                <TableHead>No of Members<span className='text-xs font-light p-1 mt-2'>(including self)</span></TableHead>
-                                <TableHead className=''>DELETE</TableHead>
-                            </TableRow>
-                        }
-                        {
-                            selectedTabs.userWithProjects === true && <TableRow className='text-lg p-2 m-4'>
-                                <TableHead>No</TableHead>
-                                <TableHead>Username</TableHead>
-                                <TableHead>No of Projects</TableHead>
-                                <TableHead>Project Deatils</TableHead>
-                                <TableHead>Filter By Role</TableHead>
-                            </TableRow>
-                        }
-
-                    </TableHeader>
-                    <TableBody>
-                        {selectedTabs.users === true && selectedTabs.projects === false && filteredUsers?.map((user, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{user?.name}</TableCell>
-                                <TableCell>{user?.username}</TableCell>
-                                <TableCell>{user?.email}</TableCell>
-                                <TableCell>{user?.password}</TableCell>
-                                <TableCell>{user?.phone}</TableCell>
-                                <TableCell className="capitalize">{user?.role}</TableCell>
-                                <TableCell className='text-white bg-black w-1  rounded-sm ' onClick={() => {
-                                    setUpdateAnyUser(user);
-                                    setUpdateDialogOpen(true);
-                                }} >
-                                    Update User
-                                </TableCell>
-                                <TableCell></TableCell>
-                                <TableCell className=' w-3  text-white bg-black rounded-sm' onClick={() => {
-                                    const promt = confirm(`Do you want to delete ${user?.name}`);
-                                    if (promt === true) {
-                                        handleDelete(user?._id);
-                                    }
-                                }}>DELETE</TableCell>
-                            </TableRow>
-                        ))}
-                        {
-                            selectedTabs.users === false && selectedTabs.projects === true && filteredProjects?.map((project, index) => (
-                                <TableRow key={index} className='m-4'>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{project?.name}</TableCell>
-                                    <TableCell>{project?.client}</TableCell>
-                                    <TableCell>{project?.by?.username}</TableCell>
-                                    <TableCell>{project?.projectManager?.username}</TableCell>
-                                    <TableCell>{dayjs(project?.createdAt).format("DD/MM/YYYY, HH:mm:ss")}</TableCell>
-                                    <TableCell className=''>{project?.group?.length}</TableCell>
-                                    <TableCell className='text-white bg-black  rounded-sm flex justify-center' onClick={async () => {
-                                        await handleProjectDelete(project?._id);
-                                    }}>Delete</TableCell>
+                <div className="overflow-y-scroll max-h-[73vh] hide-scrollbar">
+                    <Table className="min-w-full border-collapse">
+                        <TableHeader className="sticky top-0 bg-white z-10 shadow">
+                            {
+                                selectedTabs.users === true && selectedTabs.projects === false &&
+                                <TableRow>
+                                    <TableHead>No</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Username</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Password</TableHead>
+                                    <TableHead>Phone</TableHead>
+                                    <TableHead>Role</TableHead>
+                                    <TableHead className='w-1 '>Update </TableHead>
+                                    <TableHead></TableHead>
+                                    <TableHead>DELETE</TableHead>
                                 </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
+                            }
+                            {
+                                selectedTabs.users === false && selectedTabs.projects === true &&
+                                <TableRow className='text-lg p-2 m-4'>
+                                    <TableHead>No</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Client</TableHead>
+                                    <TableHead>Creator</TableHead>
+                                    <TableHead>Project Manager</TableHead>
+                                    <TableHead>Create Date</TableHead>
+                                    <TableHead>No of Members<span className='text-xs font-light p-1 mt-2'>(including self)</span></TableHead>
+                                    <TableHead className=''>DELETE</TableHead>
+                                </TableRow>
+                            }
+                            {
+                                selectedTabs.userWithProjects === true && <TableRow className='text-lg p-2 m-4'>
+                                    <TableHead>No</TableHead>
+                                    <TableHead>Username</TableHead>
+                                    <TableHead>No of Projects</TableHead>
+                                    <TableHead>Project Deatils</TableHead>
+                                    <TableHead>Filter By Role</TableHead>
+                                </TableRow>
+                            }
+                        </TableHeader>
+                        <TableBody>
+                            {selectedTabs.users === true && selectedTabs.projects === false && filteredUsers?.map((user, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{user?.name}</TableCell>
+                                    <TableCell>{user?.username}</TableCell>
+                                    <TableCell>{user?.email}</TableCell>
+                                    <TableCell>{user?.password}</TableCell>
+                                    <TableCell>{user?.phone}</TableCell>
+                                    <TableCell className="capitalize">{user?.role}</TableCell>
+                                    <TableCell className='text-white bg-black w-1  rounded-sm ' onClick={() => {
+                                        setUpdateAnyUser(user);
+                                        setUpdateDialogOpen(true);
+                                    }} >
+                                        Update User
+                                    </TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell className=' w-3  text-white bg-black rounded-sm' onClick={() => {
+                                        const promt = confirm(`Do you want to delete ${user?.name}`);
+                                        if (promt === true) {
+                                            handleDelete(user?._id);
+                                        }
+                                    }}>DELETE</TableCell>
+                                </TableRow>
+                            ))}
+                            {
+                                selectedTabs.users === false && selectedTabs.projects === true && filteredProjects?.map((project, index) => (
+                                    <TableRow key={index} className='m-4'>
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{project?.name}</TableCell>
+                                        <TableCell>{project?.client}</TableCell>
+                                        <TableCell>{project?.by?.username}</TableCell>
+                                        <TableCell>{project?.projectManager?.username}</TableCell>
+                                        <TableCell>{dayjs(project?.createdAt).format("DD/MM/YYYY, HH:mm:ss")}</TableCell>
+                                        <TableCell className=''>{project?.group?.length}</TableCell>
+                                        <TableCell className='text-white bg-black  rounded-sm flex justify-center' onClick={async () => {
+                                            await handleProjectDelete(project?._id);
+                                        }}>Delete</TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </div>
             </main>
             <Dialog open={openModal?.value} onOpenChange={() => {
                 setOpenModal({
