@@ -1,5 +1,12 @@
 "use client";
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import dynamic from "next/dynamic";
 import "jodit/es2021/jodit.min.css";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -9,11 +16,10 @@ import toast from "react-hot-toast";
 import { singleProjectType, TaskList } from "@/types";
 import { Task } from "@/components/DataList/Tabs";
 
-
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 /**
-* Props
-*/
+ * Props
+ */
 interface RTEProps {
   value: string;
   onChange: (html: string) => void;
@@ -39,7 +45,12 @@ function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
       toolbarSticky: false,
       askBeforePasteHTML: false,
       askBeforePasteFromWord: false,
-      height: 300,
+      height: 400,
+      width: 800,
+      backgroundColor: "white",
+      overflow: "scroll",
+      display: "flex",
+      flewWrap: "wrap",
       uploader: {
         url: "/api/jodit/upload",
         filesVariableName: () => "files",
@@ -59,71 +70,88 @@ function JoditEditorClient({ value, onChange, placeholder }: RTEProps) {
             message: resp.message,
           };
         },
-         defaultHandlerSuccess(this: any, resp: any) {
-      if (resp?.files?.length) {
-        console.log(resp?.files, "files");
-      resp.files.forEach((file: any) => {
-        if (file?.type === "image") {
-          // ✅ insert image
-          this.s.insertImage(file?.url);
-        } else if (file.type.startsWith("video")) {
-          // ✅ insert video
-          this.s.insertHTML(`<video controls src="${file?.url}" style="max-width:100%"></video>`);
-        } else {
-          // ✅ insert pdf/doc as link
-          this.s.insertHTML(`<a href="${file?.url}" target="_blank">${file?.url}</a>`);
-        }
-      });
-    } else if (resp.url) {
-      // fallback for single image
-      this.s.insertImage(resp.url);
-    }  },
-  error(e: any) {
-    console.error("Jodit upload error", e);
-  },
+        defaultHandlerSuccess(this: any, resp: any) {
+          if (resp?.files?.length) {
+            console.log(resp?.files, "files");
+            resp.files.forEach((file: any) => {
+              if (file?.type === "image") {
+                // ✅ insert image
+                this.s.insertImage(file?.url);
+              } else if (file.type.startsWith("video")) {
+                // ✅ insert video
+                this.s.insertHTML(
+                  `<video controls src="${file?.url}" style="max-width:100%"></video>`
+                );
+              } else {
+                // ✅ insert pdf/doc as link
+                this.s.insertHTML(
+                  `<a href="${file?.url}" target="_blank">${file?.url}</a>`
+                );
+              }
+            });
+          } else if (resp.url) {
+            // fallback for single image
+            this.s.insertImage(resp.url);
+          }
+        },
+        error(e: any) {
+          console.error("Jodit upload error", e);
+        },
       },
     }),
     [placeholder]
   );
 
   return (
-    <div className="bg-background shadow-sm overflow-hidden w-transparent rounded-xl border-b border-solid border-2">
+    <div className="shadow-sm overflow-hidden w-transparent rounded-xl border-b border-solid border-2">
       <JoditEditor
         ref={editorRef}
         value={value}
         config={config}
         onBlur={(newContent: string) => onChange(newContent)}
-        onChange={() => { }}
-        className="hide-scrollbar"
+        onChange={() => {}}
+        className="hide-scrollbar jodit_theme_custom"
       />
     </div>
   );
 }
 
 export default function ReadMeMd({
-  selectedTask, tasks, open, setOpen, projectDeatail
+  selectedTask, // fetchData
+  tasks,
+  open,
+  setOpen,
+  projectDeatail, // projectData
 }: {
-  selectedTask? :  undefined | TaskList | Task; tasks? : undefined | Task[]  ; open : boolean; setOpen : Dispatch<SetStateAction<boolean>>, projectDeatail? : singleProjectType | undefined
+  selectedTask?: undefined | TaskList | Task;
+  tasks?: undefined | Task[];
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  projectDeatail?: singleProjectType | undefined;
 }) {
-  const key = (tasks !== undefined && tasks !== null) ? tasks[0]?.id + "#$#" + selectedTask?.id : (projectDeatail !== undefined && projectDeatail !== null) ? projectDeatail?._id + "#$#" + selectedTask?.id : "";
-
+  const key =
+    tasks !== undefined && tasks !== null
+      ? tasks[0]?.id + "#$#" + selectedTask?.id
+      : projectDeatail !== undefined && projectDeatail !== null
+      ? projectDeatail?._id + "#$#" + selectedTask?.id
+      : "";
 
   const [value, setValue] = useState("");
   const [lastTimeUpdatedBy, setLastTimeUpdatedBy] = useState("");
   const [time, setTime] = useState<Date | null>();
-  
+
   const [loader, setLoader] = useState(false);
   const handleUploadHtml = async () => {
     setLoader(true);
     const request = await fetch("/api/loadHtml/post", {
       method: "POST",
       headers: {
-        "ContentType": "application/json",
+        ContentType: "application/json",
       },
       body: JSON.stringify({
         key: key,
-        html: value
-      })
+        html: value,
+      }),
     });
     if (request.ok) {
       const response = await request.json();
@@ -139,23 +167,22 @@ export default function ReadMeMd({
       setLoader(false);
       toast.error("Some Error occured");
     }
-  }
+  };
   const LoadUploadHtml = async () => {
     setLoader(true);
     const request = await fetch("/api/loadHtml/get", {
       method: "POST",
       headers: {
-        "ContentType": "application/json",
+        ContentType: "application/json",
       },
       body: JSON.stringify({
-        key: key
-      })
+        key: key,
+      }),
     });
     if (request.ok) {
       const response = await request.json();
       if (response.success) {
-
-        console.log(typeof response.data, response.data)
+        console.log(typeof response.data, response.data);
         setValue(response?.data?.html);
         setLastTimeUpdatedBy(response?.data?.updatedBy);
         setTime(response?.data?.updatedAt);
@@ -168,42 +195,53 @@ export default function ReadMeMd({
       setLoader(false);
       toast.error("Some Error occured");
     }
-  }
+  };
   useEffect(() => {
     LoadUploadHtml();
-  }, [])
-  
+  }, []);
+
   return (
     <>
-    {open && (
-  <div className="fixed inset-0  z-50 bg-black/50"></div>
-)}
-    <dialog open={open}
-      className={`z-100  flex-col absolute ${open === true ? 'animate-in fade-in-0 zoom-out-95' : 'animate-out fade-out-0 zoom-in-95'} flex items-center justify-center m-auto   w-[60vw] rounded-xl  px-6  shadow-lg duration-200 top-5 bottom-5 max-h-[80vh] overflow-y-scroll hide-scrollbar py-4`}
-    >
-      <div id="x-dialog-box" className="w-full flex justify-end mb-4">
-        <X onClick={() => setOpen(false)} />
-      </div>
-      {
-        lastTimeUpdatedBy &&
-        <p className="w-full flex justify-end mt-2 mb-2">
-          Last Time Updated By : <span className="text-bold font-sans ml-2 mt-.5">{lastTimeUpdatedBy ?? "Unknown"} at {time !== null && time !== undefined && new Date(time).toLocaleString()}</span>
-        </p>
-      }
-      <JoditEditorClient
-        value={value} onChange={setValue} placeholder=""
-      />
-      <div className="flex justify-end w-full mt-4">
-        <span onClick={() => {
-          if (!loader) {
-            handleUploadHtml()
-          }
-        }}>{
-            loader ? <Loader className="animate-spin" /> : <Upload />
-          }
-        </span>
-      </div>
-    </dialog>
+      {open && <div className="fixed inset-0  z-50 bg-black/50"></div>}
+      <dialog
+        open={open}
+        className={`z-100  flex-col absolute ${
+          open === true
+            ? "animate-in fade-in-0 zoom-out-95"
+            : "animate-out fade-out-0 zoom-in-95"
+        } flex items-center justify-center m-auto   w-[60vw] rounded-xl  px-6  shadow-lg duration-200 top-5 bottom-5 max-h-[80vh] overflow-y-scroll hide-scrollbar py-4`}
+      >
+        <div id="x-dialog-box" className="w-full flex justify-end mb-4">
+          <X onClick={() => setOpen(false)} />
+        </div>
+        {lastTimeUpdatedBy && (
+          <p className="w-full flex justify-end mt-2 mb-2">
+            Last Time Updated By :{" "}
+            <span className="text-bold font-sans ml-2 mt-.5">
+              {lastTimeUpdatedBy ?? "Unknown"} at{" "}
+              {time !== null &&
+                time !== undefined &&
+                new Date(time).toLocaleString()}
+            </span>
+          </p>
+        )}
+        <JoditEditorClient value={value} onChange={setValue} placeholder="" />
+        <div className="flex justify-end w-full mt-4">
+          <span
+            onClick={() => {
+              if (!loader) {
+                handleUploadHtml();
+              }
+            }}
+          >
+            {loader ? (
+              <Loader className="animate-spin" />
+            ) : (
+              <p className="underline decoration-double">Save</p>
+            )}
+          </span>
+        </div>
+      </dialog>
     </>
   );
 }

@@ -7,7 +7,11 @@ const MessageContainer = new mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : "RegisterUsers",
     },
-    createdAt : Date,
+    attachments : [],
+    createdAt : {
+        type : Date,
+        default : new Date(),
+    },
 },{
     timestamps : true,
 });

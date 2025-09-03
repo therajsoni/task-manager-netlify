@@ -116,6 +116,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -125,6 +126,7 @@
 .project-item {
   @apply hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 hover:bg-gray-300;
 }
+
 .project-item.selected {
   @apply bg-gray-300;
 }
@@ -133,11 +135,16 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
+
+.jodit_theme_custom {
+  --jd-color-background-default: #ffffff;
+}
 
 /* styles.css */
 /* .root-plus-btn {
@@ -168,8 +175,8 @@
     min-width: 60px !important;
   }
 
-  .overflow-hidden[data-sidebar='sidebar'] > .sidebar-header,
-  .overflow-hidden[data-sidebar='sidebar'] > .sidebar-content {
+  .overflow-hidden[data-sidebar='sidebar']>.sidebar-header,
+  .overflow-hidden[data-sidebar='sidebar']>.sidebar-content {
     width: 60px !important;
   }
 
@@ -187,7 +194,9 @@
   }
 }
 
-html, body, #__next {
+html,
+body,
+#__next {
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -208,7 +217,7 @@ html, body, #__next {
 
 .scroll-auto {
   margin-top: 56px;
-    overflow-y: auto;
+  overflow-y: auto;
   flex-grow: 1;
 }
 
@@ -218,6 +227,7 @@ html, body, #__next {
 
 /* Small screens (mobile) */
 @media (max-width: 640px) {
+
   /* Sidebar main container */
   .sidebar {
     width: 100% !important;
@@ -225,11 +235,12 @@ html, body, #__next {
     height: 100vh !important;
     z-index: 9999 !important;
     overflow-y: auto !important;
-    background: inherit; /* keep existing background */
+    background: inherit;
+    /* keep existing background */
   }
 
   /* Hide secondary sidebar on small screens */
-  .sidebar + .sidebar {
+  .sidebar+.sidebar {
     display: none !important;
   }
 
@@ -270,13 +281,14 @@ html, body, #__next {
 
 /* Medium screens (tablets) */
 @media (min-width: 641px) and (max-width: 1024px) {
+
   /* Sidebar width reduced */
   .sidebar {
     width: 250px !important;
   }
 
   /* Secondary sidebar */
-  .sidebar + .sidebar {
+  .sidebar+.sidebar {
     display: block !important;
     width: calc(100% - 250px) !important;
   }
@@ -294,13 +306,14 @@ html, body, #__next {
 
 /* Large screens (desktop and above) */
 @media (min-width: 1025px) {
+
   /* Sidebar default width */
   .sidebar {
     width: var(--sidebar-width) !important;
   }
 
   /* Show both sidebars */
-  .sidebar + .sidebar {
+  .sidebar+.sidebar {
     display: flex !important;
     width: calc(100% - var(--sidebar-width)) !important;
   }
@@ -316,13 +329,13 @@ html, body, #__next {
   }
 
   /* Flex container adjustments */
-  .bg-white.shadow-md.p-4.w-full.mt-11 > .flex {
+  .bg-white.shadow-md.p-4.w-full.mt-11>.flex {
     flex-direction: column;
     gap: 0.75rem;
   }
 
   /* Project header */
-  h1.text-lg.font-semibold.text-gray-800.flex.flex-col > div.m-2.ml-0 {
+  h1.text-lg.font-semibold.text-gray-800.flex.flex-col>div.m-2.ml-0 {
     font-size: 1.25rem;
     margin-left: 0;
     text-align: center;
@@ -338,7 +351,7 @@ html, body, #__next {
   }
 
   /* Buttons container */
-  .w-full.sm\:w-auto.sm\:min-w-\[20\%\].flex.justify-end.gap-4.text-sm.pt-2 > div.flex.flex-wrap.justify-between.items-center {
+  .w-full.sm\:w-auto.sm\:min-w-\[20\%\].flex.justify-end.gap-4.text-sm.pt-2>div.flex.flex-wrap.justify-between.items-center {
     flex-direction: column;
     align-items: center;
   }
@@ -371,8 +384,9 @@ html, body, #__next {
 
 /* For very small devices */
 @media (max-width: 480px) {
+
   /* Further reduce font sizes and padding */
-  h1.text-lg.font-semibold.text-gray-800.flex.flex-col > div.m-2.ml-0 {
+  h1.text-lg.font-semibold.text-gray-800.flex.flex-col>div.m-2.ml-0 {
     font-size: 1.1rem;
   }
 

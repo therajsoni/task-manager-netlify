@@ -7,37 +7,66 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Textarea } from "../ui/textarea";
 import toast from "react-hot-toast";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Delete } from "lucide-react";
-export default function AddTaskModal(
-  { type, open, setOpen, onSave, projectId }: {
-    type: string,
-    open: boolean,
-    projectId: string,
-    setOpen: Dispatch<SetStateAction<boolean>>
-    onSave: (data: { name: string; description: string; status: string, responsibility: string }) => void;
-
-  }) {
+import { Label } from "../ui/label";
+import { useRefreshDBProvider } from "@/utils/RefreshDbs";
+export default function AddTaskModal({
+  type,
+  open,
+  setOpen,
+  onSave,
+  projectId,
+}: {
+  type: string;
+  open: boolean;
+  projectId: string;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  onSave: (data: {
+    name: string;
+    description: string;
+    status: string;
+    responsibility: string;
+    features: {
+      document: boolean;
+    };
+  }) => void;
+}) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("Pending");
   const [responsiblePerson, setResponsiblePerson] = useState<string[]>();
   const [listOfResponsive, setListOfResponsive] = useState<string[]>([]);
-
-
-
+  const [features, setFeatures] = useState({
+    document: false,
+  });
   const fetchAllResponsiblePerson = useCallback(async () => {
     const request = await fetch(`/api/project/getId/${projectId}`, {
       method: "POST",
       body: JSON.stringify({
-        id: projectId
+        id: projectId,
       }),
       headers: {
         "Content-Type": "application/json",
-      }
+      },
     });
     console.log(request, "45", projectId);
 
@@ -45,41 +74,50 @@ export default function AddTaskModal(
       const response = await request.json();
       if (response?.success) {
         const owner = response?.data?.by?.username;
-        const groupMembers = response?.data?.group?.map((item: {
-          member: string,
-          time: Date
-        }) => item?.member) || [];
-        const unique = Array.from(new Set([owner, ...groupMembers].filter(Boolean)));
+        const groupMembers =
+          response?.data?.group?.map(
+            (item: { member: string; time: Date }) => item?.member
+          ) || [];
+        const unique = Array.from(
+          new Set([owner, ...groupMembers].filter(Boolean))
+        );
         setResponsiblePerson(unique);
       } else {
-        toast.error("json Error occuring while fetching members")
+        toast.error("json Error occuring while fetching members");
       }
     } else {
-      toast.error("Error occuring while fetching members")
+      toast.error("Error occuring while fetching members");
     }
-  }, [projectId])
+  }, [projectId]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (name && listOfResponsive.length > 0 && status) {
       onSave({
         name,
-        responsibility: listOfResponsive?.map(name => name.trim()).join(', '),
-        status, description
+        responsibility: listOfResponsive?.map((name) => name.trim()).join(", "),
+        status,
+        description,
+        features,
       });
+
       setName("");
       setStatus("Pending");
       setDescription("");
-      setListOfResponsive([])
+      setListOfResponsive([]);
+      setFeatures({
+        document: false,
+      });
     }
   };
 
   useEffect(() => {
     fetchAllResponsiblePerson();
-  }, [fetchAllResponsiblePerson])
+  }, [fetchAllResponsiblePerson]);
 
   if (type === "show" || type === "edit" || type === "delete") {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -89,10 +127,16 @@ export default function AddTaskModal(
           <DialogTitle>Add task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input placeholder="Task Name" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input
+            placeholder="Task Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
           <Select
             onValueChange={(value) => {
-              setListOfResponsive((prev) => (prev.includes(value) ? prev : [...prev, value]));
+              setListOfResponsive((prev) =>
+                prev.includes(value) ? prev : [...prev, value]
+              );
             }}
           >
             <SelectTrigger className="w-full">
@@ -103,26 +147,33 @@ export default function AddTaskModal(
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Responsible Person</SelectLabel>
-                {
-                  responsiblePerson
-                    ?.filter((item) => !listOfResponsive.includes(item))
-                    .map((item: string, index: number) => (
-                      <SelectItem key={index} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))
-                }
+                {responsiblePerson
+                  ?.filter((item) => !listOfResponsive.includes(item))
+                  .map((item: string, index: number) => (
+                    <SelectItem key={index} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
               </SelectGroup>
             </SelectContent>
           </Select>
-    <div className={`flex flex-wrap justify-start items-center ${listOfResponsive.length > 0 && "gap-4 p-2"}`}>
+          <div
+            className={`flex flex-wrap justify-start items-center ${
+              listOfResponsive.length > 0 && "gap-4 p-2"
+            }`}
+          >
             {listOfResponsive.map((name) => (
-              <div key={name} className="relative inline-block border p-2 rounded border-black">
+              <div
+                key={name}
+                className="relative inline-block border p-2 rounded border-black"
+              >
                 <span className="text-base font-medium">{name}</span>
                 <span
                   className="absolute -top-2 -right-2 cursor-pointer"
                   onClick={() =>
-                    setListOfResponsive((prev) => prev.filter((n) => n !== name))
+                    setListOfResponsive((prev) =>
+                      prev.filter((n) => n !== name)
+                    )
                   }
                 >
                   <Delete size={16} />
@@ -130,27 +181,58 @@ export default function AddTaskModal(
               </div>
             ))}
           </div>
-          <Textarea placeholder="Description of task" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Select disabled={type === "show"} value={status}
-            onValueChange={value => setStatus(value)}>
+          <Textarea
+            placeholder="Description of task"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <Select
+            disabled={type === "show"}
+            value={status}
+            onValueChange={(value) => setStatus(value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="select status"></SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Status</SelectLabel>
-                <SelectItem value={'completed'}>Completed</SelectItem>
-                <SelectItem value={'Pending'}>Pending</SelectItem>
+                <SelectItem value={"completed"}>Completed</SelectItem>
+                <SelectItem value={"Pending"}>Pending</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
+          {/* <div className="flex justify-around items-center">
+            <Label className="w-24">Features</Label>
+            <div className="w-[93%] border-1 rounded-[4px] p-2 border-gray-300">
+              <div className="flex gap-2 flex-row">
+                <div>Document</div>
+                <input
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setFeatures({
+                      ...features,
+                      document: e.target.checked,
+                    });
+                  }}
+                  className="h-6 w-6"
+                  type="checkbox"
+                />
+              </div>
+            </div>
+          </div> */}
           <div className="text-right">
-            <Button type="submit" onClick={async () => {
-              toast.success("Added & click the Refresh Btn ", {
-                duration: 3000,
-                position: "top-right"
-              })
-            }}>Save</Button>
+            <Button
+              type="submit"
+              onClick={async () => {
+                toast.success("Added & click the Refresh Btn ", {
+                  duration: 3000,
+                  position: "top-right",
+                });
+              }}
+            >
+              Save
+            </Button>
           </div>
         </form>
       </DialogContent>

@@ -3,13 +3,15 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request?.json();
-    const { username, password } = body;
+    let { username, password } = body;
     if (!username || !password) {
       return NextResponse.json({
         message: "Username and password are required",
         status: 400,
       });
     }
+
+    username = username.trim().toLowerCase();
     const response = await loginUser({ username, password });
     if (!response.success) {
       return NextResponse.json({
@@ -34,6 +36,7 @@ export async function POST(request: Request) {
       return responseStack;
     }
   } catch (error) {
+    console.log(error, "error")
     return NextResponse.json({ message: "Internal Server Error", status: 500, error });
   }
 }

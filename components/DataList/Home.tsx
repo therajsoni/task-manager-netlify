@@ -7,7 +7,20 @@ import FallBackShowStatus from "./FallBackShowStatus";
 import UpdateProjectDetails from "../UpdateProjectDetails";
 import { Label } from "../ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { AlertCircle, EditIcon, Plus, RotateCw, Upload, View } from "lucide-react";
+import {
+  AlertCircle,
+  ChefHat,
+  CloudLightning,
+  EditIcon,
+  FileEdit,
+  LucideAlignCenter,
+  LucideArrowDownToDot,
+  Pen,
+  Plus,
+  RotateCw,
+  Upload,
+  View,
+} from "lucide-react";
 import { singleProjectType } from "@/types";
 import { AlertLogges } from "./ShowAlertLogges";
 import { useRoleProvider } from "@/utils/roleProviderContext";
@@ -15,103 +28,123 @@ import TaskEditor from "../DictinoryBox/TaskDescribeDetailBox";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import ViewGraphs from "@/utils/DocUtils/ViewGraphs";
 import ReadMeMd from "@/utils/DocUtils/ReadMeMd";
+import ChatBox from "@/utils/chatPage";
+import ChatF from "@/utils/DocUtils/ChatF";
+import { DraggableToast } from "../DraggableToast";
+import AlertPage from "../AlertPage";
+import MermaidEditor from "@/utils/DocUtils/NewReadMeMd";
+import ProEditor from "@/utils/DocUtils/ProEditor";
 // import AlertPage from "../AlertPage";
-// import AlertPage from "../AlertPage";
-export default function HomeDataListPage({ username, userData, identifier, actionCreateUpdate, clickProjectData, toggleActionCreateUpdateFn, setActionCreateUpdate
+export default function HomeDataListPage({
+  username,
+  userData,
+  identifier,
+  actionCreateUpdate,
+  clickProjectData,
+  toggleActionCreateUpdateFn,
+  setActionCreateUpdate,
 }: {
-    username: string,
-    userData: {
-        username: string,
-        password: string,
-        identifier: string,
-        _id: string
-    },
-    actionCreateUpdate: {
-        open: boolean,
-        action: string
-    }, clickProjectData: singleProjectType | undefined, toggleActionCreateUpdateFn: (args: string) => void, identifier: string, setActionCreateUpdate: Dispatch<SetStateAction<{
-        open: boolean,
-        action: string,
-    }>>
+  username: string;
+  userData: {
+    username: string;
+    password: string;
+    identifier: string;
+    _id: string;
+  };
+  actionCreateUpdate: {
+    open: boolean;
+    action: string;
+  };
+  clickProjectData: singleProjectType | undefined;
+  toggleActionCreateUpdateFn: (args: string) => void;
+  identifier: string;
+  setActionCreateUpdate: Dispatch<
+    SetStateAction<{
+      open: boolean;
+      action: string;
+    }>
+  >;
 }) {
-    const [uploadBoxOpen, setUploadBoxOpen] = useState<boolean>(false);
-    const [stateAlert, setStateAlert] = useState(false);
-    const [isEmail, setIsEmail] = useState(false);
-    const [updateProjectData, setUpdateProjectData] = useState<boolean>(false);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [isAdmin] = useState<boolean>(false);
-    const [isOpenShowProjectDetailDialog, setIsOpenShowProjectDetailDialog] = useState<boolean>(false);
-    const [type, setType] = useState("");
-    const [showLogges, setShowLogges] = useState<boolean>(false);
-    const [viewGraphs, setViewGraphs] = useState(false);
-    const {
-        loginrole,
-        projectBaseRole,
-        data: UserGlobalData,
-    } = useRoleProvider();
-    const [uploadBoxKeyBoardDown, setUploadBoxKeyBoardDown] = useState(false);
-    useEffect(() => {
-        if (loginrole && UserGlobalData && clickProjectData?.name) {
-            projectBaseRole(clickProjectData?.name);
-        }
-    }, [
-        loginrole,
-        UserGlobalData,
-        clickProjectData?.name
-    ]);
-    const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [uploadBoxOpen, setUploadBoxOpen] = useState<boolean>(false);
+  const [stateAlert, setStateAlert] = useState(false);
+  const [isEmail, setIsEmail] = useState(false);
+  const [updateProjectData, setUpdateProjectData] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isAdmin] = useState<boolean>(false);
+  const [isOpenShowProjectDetailDialog, setIsOpenShowProjectDetailDialog] =
+    useState<boolean>(false);
+  const [type, setType] = useState("");
+  const [showLogges, setShowLogges] = useState<boolean>(false);
+  const [viewGraphs, setViewGraphs] = useState(false);
+  const [chatFOpen, setChatFOpen] = useState(false);
+  const [newMsg, setNewMsg] = useState(true);
+  const {
+    loginrole,
+    projectBaseRole,
+    data: UserGlobalData,
+  } = useRoleProvider();
+  const [uploadBoxKeyBoardDown, setUploadBoxKeyBoardDown] = useState(false);
+  useEffect(() => {
+    if (loginrole && UserGlobalData && clickProjectData?.name) {
+      projectBaseRole(clickProjectData?.name);
+    }
+  }, [loginrole, UserGlobalData, clickProjectData?.name]);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
-    function onClose() {
-        setIsOpen((prev: boolean) => !prev);
-    }
-    if (actionCreateUpdate.open && actionCreateUpdate?.action === "createProject") {
-        return <></>
-    }
-    if (!clickProjectData) {
-        return <DefaultPage />
-    }
-    return (
-        <>
-            <div className="bg-white shadow-md p-4 w-full mt-2">
-                <div className="flex flex-wrap justify-between items-center mb-3">
-                    <h1 className="text-lg font-semibold text-gray-800 flex flex-col">
-                        <div className="m-2 ml-0">{NameLengthManage(clickProjectData?.name, 80)}</div>
-                    </h1>
-                    <div className="w-full sm:w-auto sm:min-w-[20%] flex justify-end gap-4 text-sm pt-2">
-                        <div className="flex flex-wrap justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                <div className="flex -space-x-2">
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
-                                                onClick={() => {
-                                                    setType("addGroupMember")
-                                                    setIsOpen((prev: boolean) => !prev);
-                                                }}
-                                            >
-                                                    <Plus />
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Add Group Member
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </div>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
-                                            onClick={() => {
-                                                setUpdateProjectData(true);
-                                            }}
-                                        >
-                                                <RotateCw />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Update Project
-                                    </TooltipContent>
-                                </Tooltip>
-                                {/* <span className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
+  function onClose() {
+    setIsOpen((prev: boolean) => !prev);
+  }
+  if (
+    actionCreateUpdate.open &&
+    actionCreateUpdate?.action === "createProject"
+  ) {
+    return <></>;
+  }
+  if (!clickProjectData) {
+    return <DefaultPage />;
+  }
+  return (
+    <>
+      <div className="bg-white shadow-md p-4 w-full mt-2">
+        <div className="flex flex-wrap justify-between items-center mb-3">
+          <h1 className="text-lg font-semibold text-gray-800 flex flex-col">
+            <div className="m-2 ml-0">
+              {NameLengthManage(clickProjectData?.name, 80)}
+            </div>
+          </h1>
+          <div className="w-full sm:w-auto sm:min-w-[20%] flex justify-end gap-4 text-sm pt-2">
+            <div className="flex flex-wrap justify-between items-center">
+              <div className="flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div
+                        className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
+                        onClick={() => {
+                          setType("addGroupMember");
+                          setIsOpen((prev: boolean) => !prev);
+                        }}
+                      >
+                        <Plus />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Add Group Member</TooltipContent>
+                  </Tooltip>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div
+                      className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
+                      onClick={() => {
+                        setUpdateProjectData(true);
+                      }}
+                    >
+                      <LucideArrowDownToDot />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Update Project</TooltipContent>
+                </Tooltip>
+                {/* <span className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
                                     onClick={() => {
                                         setUploadBoxOpen(true);
                                     }}
@@ -122,38 +155,55 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                         setUploadBoxKeyBoardDown(false);
                                     }}
                                 > */}
-                                {/* {uploadBoxKeyBoardDown && <span>
+                {/* {uploadBoxKeyBoardDown && <span>
                                         Upload project files
                                     </span>} */}
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                        <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
-
-                                        >
-                                                <EditIcon onClick={() => {
-                                                    setIsEditorOpen(true);
-                                                }} />
-                                        </div>        
-                                        </TooltipTrigger>
-                                                                            <TooltipContent>
-                                        ProEditor
-                                    </TooltipContent>
-                                    </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
-
-                                        >
-                                                <Upload onClick={() => {
-                                                    setUploadBoxOpen(true);
-                                                }} />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Add Attachments
-                                    </TooltipContent>
-                                </Tooltip>
-                                {/* <Tooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs">
+                      <LucideAlignCenter
+                        onClick={() => {
+                          setIsEditorOpen(true);
+                        }}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>ProEditor</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs">
+                      <Upload
+                        onClick={() => {
+                          setUploadBoxOpen(true);
+                        }}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Add Attachments</TooltipContent>
+                </Tooltip>
+                {/* <Tooltip>
+                  <TooltipTrigger>
+                    <div
+                      className={`${
+                        newMsg === true
+                          ? "text-[white] bg-black hover:text-white hover:bg-[black] text-2xl"
+                          : "bg-[#DEE791] text-black hover:bg-[#DEE791]"
+                      }   ml-5 p-2 rounded-xs `}
+                    >
+                      <CloudLightning
+                        onClick={() => {
+                          setChatFOpen(true);
+                        }}
+                        className="font-bold"
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {newMsg ? "New Message" : "Pro Chat"}
+                  </TooltipContent>
+                </Tooltip> */}
+                {/* <Tooltip>
                                     <TooltipTrigger>
                                         <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
                                         >
@@ -166,7 +216,7 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                         View Graphs
                                     </TooltipContent>
                                 </Tooltip> */}
-                                {/* <Tooltip>
+                {/* <Tooltip>
                                     <TooltipTrigger>
                                               <div className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
 
@@ -182,62 +232,115 @@ export default function HomeDataListPage({ username, userData, identifier, actio
                                         Create Project Alert
                                     </TooltipContent>
                                 </Tooltip> */}
-                                {/* </span> */}
-                                {/* <span className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
-                                    onClick={() => {
-                                        setStateAlert(true);
-                                    }}
-                                >
-                                    <AlertCircle />
-                                </span> */}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* </span> */}
+                {/* <span
+                  className="bg-[#DEE791] hover:bg-[#DEE791] text-black ml-5 p-2 rounded-xs"
+                  onClick={() => {
+                    setStateAlert(true);
+                  }}
+                >
+                  <AlertCircle />
+                </span> */}
+              </div>
             </div>
-            <div className="flex flex-wrap justify-between items-center p-2 tracking-normal bg-gray-100">
-                <Label className="text-sm/8  font-thinlight pl-3">{clickProjectData?.description ?? <>{"It's Very Big Project and important project we all need to focus on them and try to give agian as we give 100% to all projects Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi sapiente consectetur error ullam eveniet aperiam similique reprehenderit distinctio?"}
-                </>} </Label>
-            </div>
-            <hr className="text-black" />
-            {
-                updateProjectData
-                &&
-                <UpdateProjectDetails id={clickProjectData?._id} oldData={clickProjectData} open={updateProjectData} setOpen={setUpdateProjectData} />
-            }
-            {isOpen ?
-                <FallBackShowStatus isOpen={isOpen} onClose={onClose} isAdmin={isAdmin} type={type} clickProjectData={clickProjectData} /> : <></>}
-            {isOpenShowProjectDetailDialog && <FallBackShowProjectDialog isOpenShowProjectDetail={isOpenShowProjectDetailDialog} setIsOpenShowProjectDetailDialog={setIsOpenShowProjectDetailDialog} clickProjectData={clickProjectData} />}
-            <CustomTabs identifier={identifier}
-                data={clickProjectData}
-                userData={userData}
-            />
-            {
-                showLogges && <AlertLogges open={showLogges} onClose={setShowLogges} />
-            }
-            {
-                uploadBoxOpen && <>
-                            <TaskEditor uploadBoxOpen={uploadBoxOpen} setUploadBoxOpen={setUploadBoxOpen} openMain={uploadBoxOpen} clickProjectData={clickProjectData} />
-                    
-                </>
-            }
-            {
-                viewGraphs && <>
-                        <ViewGraphs 
-                        viewGraphs={viewGraphs}
-                        setViewGraphs={setViewGraphs}
-                        // clickProjectData={clickProjectData}
-                         />
-                </>
-            }
-            {
-                isEditorOpen && <ReadMeMd selectedTask={undefined} tasks={undefined} open={isEditorOpen} setOpen={setIsEditorOpen} projectDeatail={clickProjectData}/>
-            }
-            {/* {
-                stateAlert && <>
-                    <AlertPage stateAlert={stateAlert} setStateAlert={setStateAlert} projectDeatils={clickProjectData} />
-                </>
-            } */}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-between items-center p-2 tracking-normal bg-gray-100">
+        <Label className="text-sm/8  font-thinlight pl-3">
+          {clickProjectData?.description ?? (
+            <>
+              {
+                "It's Very Big Project and important project we all need to focus on them and try to give agian as we give 100% to all projects Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi sapiente consectetur error ullam eveniet aperiam similique reprehenderit distinctio?"
+              }
+            </>
+          )}{" "}
+        </Label>
+      </div>
+      <hr className="text-black" />
+      {updateProjectData && (
+        <UpdateProjectDetails
+          id={clickProjectData?._id}
+          oldData={clickProjectData}
+          open={updateProjectData}
+          setOpen={setUpdateProjectData}
+        />
+      )}
+      {isOpen ? (
+        <FallBackShowStatus
+          isOpen={isOpen}
+          onClose={onClose}
+          isAdmin={isAdmin}
+          type={type}
+          clickProjectData={clickProjectData}
+        />
+      ) : (
+        <></>
+      )}
+      {isOpenShowProjectDetailDialog && (
+        <FallBackShowProjectDialog
+          isOpenShowProjectDetail={isOpenShowProjectDetailDialog}
+          setIsOpenShowProjectDetailDialog={setIsOpenShowProjectDetailDialog}
+          clickProjectData={clickProjectData}
+        />
+      )}
+      <CustomTabs
+        identifier={identifier}
+        data={clickProjectData}
+        userData={userData}
+      />
+      {showLogges && <AlertLogges open={showLogges} onClose={setShowLogges} />}
+      {uploadBoxOpen && (
+        <>
+          <TaskEditor
+            uploadBoxOpen={uploadBoxOpen}
+            setUploadBoxOpen={setUploadBoxOpen}
+            openMain={uploadBoxOpen}
+            clickProjectData={clickProjectData}
+          />
         </>
-    );
+      )}
+      {chatFOpen && (
+        <ChatF
+          open={chatFOpen}
+          setOpen={setChatFOpen}
+          clickProjectData={clickProjectData}
+        />
+      )}
+      {viewGraphs && (
+        <>
+          <ViewGraphs
+            viewGraphs={viewGraphs}
+            setViewGraphs={setViewGraphs}
+            // clickProjectData={clickProjectData}
+          />
+        </>
+      )}
+      {isEditorOpen && (
+        // <ReadMeMd
+        //   selectedTask={undefined}
+        //   tasks={undefined}
+        //   open={isEditorOpen}
+        //   setOpen={setIsEditorOpen}
+        //   projectDeatail={clickProjectData}
+        // />
+        <ProEditor
+          selectedTask={undefined}
+          tasks={undefined}
+          open={isEditorOpen}
+          setOpen={setIsEditorOpen}
+          projectDeatail={clickProjectData}
+        />
+      )}
+      {stateAlert && (
+        <>
+          <AlertPage
+            stateAlert={stateAlert}
+            setStateAlert={setStateAlert}
+            projectDeatils={clickProjectData}
+          />
+        </>
+      )}
+    </>
+  );
 }

@@ -1,7 +1,8 @@
 "use client";
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
 import CreateProjectDialog from "@/components/Createproject";
 import DefaultPage from "@/components/defaultHomePageProjectWhenNotClickAnyProject";
+import { DraggableToast } from "@/components/DraggableToast";
 // import { DraggableToast } from "@/components/DraggableToast";
 import {
   Breadcrumb,
@@ -10,54 +11,59 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import { singleProjectType } from "@/types";
 import NameLengthManage from "@/utils/nameLengthManage";
 import useProjectStore from "@/utils/store";
 import dynamic from "next/dynamic";
-import {useState } from "react";
-const HomeDataListPage = dynamic(() => import("@/components/DataList/Home"), { ssr: false })
-export default function Page(
-) {
+import { useState } from "react";
+const HomeDataListPage = dynamic(() => import("@/components/DataList/Home"), {
+  ssr: false,
+});
+export default function Page() {
+  const [draggableToast, setDraggableToast] = useState(true);
+
   const identifier = useProjectStore((state) => state.identifier);
   const [actionCreateUpdate, setActionCreateUpdate] = useState<{
-    open: boolean,
-    action: string
+    open: boolean;
+    action: string;
   }>({ open: false, action: "" });
-  const [clickProjectData, setClickProjectData] = useState<singleProjectType | undefined>();
+  const [clickProjectData, setClickProjectData] = useState<
+    singleProjectType | undefined
+  >();
   const [openCreateProject, setOpenCreateProject] = useState(false);
   function toggleActionCreateUpdateFn(args: string) {
     setActionCreateUpdate({ open: !actionCreateUpdate.open, action: args });
   }
   const [user, setUser] = useState<{
-    username: string,
-    password: string,
-    identifier: string,
-    _id: string
+    username: string;
+    password: string;
+    identifier: string;
+    _id: string;
   }>({
     username: "",
     password: "",
     identifier: "",
     _id: "",
   });
-   const [newAlert, setNewAlert] = useState(false);
-   const [alertData,setAlertData] = useState<{
-    title : string,
-    description : string,
-    createdBy : string,
-    time : Date
-   }>({
-    title : "",
-    description : "",
-    createdBy : "",
-    time : new Date()
-   })
+  const [newAlert, setNewAlert] = useState(false);
+  const [alertData, setAlertData] = useState<{
+    title: string;
+    description: string;
+    createdBy: string;
+    time: Date;
+  }>({
+    title: "",
+    description: "",
+    createdBy: "",
+    time: new Date(),
+  });
   return (
     <SidebarProvider
       style={
@@ -69,8 +75,8 @@ export default function Page(
       <AppSidebar
         user={user}
         setUser={setUser}
-        setOpenCreateProject={setOpenCreateProject} 
-        clickProjectData={clickProjectData} 
+        setOpenCreateProject={setOpenCreateProject}
+        clickProjectData={clickProjectData}
         toggleActionCreateUpdateFn={toggleActionCreateUpdateFn}
         setClickProjectData={setClickProjectData}
       />
@@ -88,24 +94,34 @@ export default function Page(
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>{NameLengthManage(clickProjectData?.name ?? "", 160) ?? "project"}</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {NameLengthManage(clickProjectData?.name ?? "", 160) ??
+                    "project"}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className=" scroll-auto flex flex-1 flex-col mt-3 " style={{
-        }}>
-          {
-            openCreateProject && <CreateProjectDialog
-              setOpen={setOpenCreateProject} open={openCreateProject} />
-          }
-          {
-            clickProjectData === null ? <DefaultPage /> : <HomeDataListPage
+        <div className=" scroll-auto flex flex-1 flex-col mt-3 " style={{}}>
+          {openCreateProject && (
+            <CreateProjectDialog
+              setOpen={setOpenCreateProject}
+              open={openCreateProject}
+            />
+          )}
+          {clickProjectData === null ? (
+            <DefaultPage />
+          ) : (
+            <HomeDataListPage
               username={user?.username}
               userData={user}
               identifier={identifier}
-              toggleActionCreateUpdateFn={toggleActionCreateUpdateFn} actionCreateUpdate={actionCreateUpdate} clickProjectData={clickProjectData} setActionCreateUpdate={setActionCreateUpdate} />
-          }
+              toggleActionCreateUpdateFn={toggleActionCreateUpdateFn}
+              actionCreateUpdate={actionCreateUpdate}
+              clickProjectData={clickProjectData}
+              setActionCreateUpdate={setActionCreateUpdate}
+            />
+          )}
         </div>
         {/* {
                 newAlert && <DraggableToast
@@ -114,7 +130,20 @@ export default function Page(
                         setNewAlert(false)
                     } />
             }  */}
+        {/* {draggableToast && (
+          <DraggableToast
+            data={{
+              title: "Server Down",
+              description: "Now Server Down Please Check & Just resolve this",
+              createdBy: "Raj Soni",
+              time: new Date(),
+            }}
+            onClose={() => {
+              setDraggableToast(false);
+            }}
+          />
+        )} */}
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

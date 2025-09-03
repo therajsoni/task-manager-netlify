@@ -40,7 +40,12 @@ export interface ClickProject {
   }],
   name: string,
   status: string,
-  _id: string
+  _id: string,
+  projectManager?: {
+    username?: string,
+    _id?: string
+  },
+
 }
 
 export interface dataObj {
@@ -50,7 +55,7 @@ export interface dataObj {
     responsibility: [string],
   },
 }
-export interface oldTask{
+export interface oldTask {
   project_name: "",
   actions: {
     addItems: [],
@@ -59,41 +64,45 @@ export interface oldTask{
 }
 
 export interface dataType {
-  by : {
-    username : string 
+  by: {
+    username: string
   },
-  client:string,
-  createdAt : Date,
-  description : string,
-  group : [] | [
+  client: string,
+  createdAt: Date,
+  description: string,
+  group: [] | [
     {
-      member : string,
-      time : Date
+      member: string,
+      time: Date
     }
   ],
-  name : string,
-  status : string,
-  _id : string
+  name: string,
+  status: string,
+  _id: string
 }
 
-export interface singleProjectType{
-  by : {
-    username : string;
+export interface singleProjectType {
+  by: {
+    username: string;
   },
-  client : string;
-  createdAt : Date;
-  description : string;
-  group : [{
-    member : string;
-    time : Date;
-    identifier : string;
+  client: string;
+  createdAt: Date;
+  description: string;
+  group: [{
+    member: string;
+    time: Date;
+    identifier: string;
   }],
-  name : string;
-  status : string;
-  _id : string;
-  attachments : {
-    name:string;url:string;uploader:string;date:Date
-  }[]
+  name: string;
+  status: string;
+  _id: string;
+  attachments: {
+    name: string; url: string; uploader: string; date: Date
+  }[],
+  projectManager?: {
+    username?: string,
+    _id?: string
+  }
 }
 
 export interface TaskNode {
@@ -102,7 +111,7 @@ export interface TaskNode {
   description: string;
   status: string;
   responsibility: string;
-  createdAt : string;
+  createdAt: string;
   children?: TaskNode[];
 }
 
@@ -123,16 +132,19 @@ export interface ProjectResponse {
 }
 
 
-export interface TaskList{
- id : string,
- name : string,
- description : string,
- status :string,
- responsibility : string,
- createdAt : string
- by? : string;
+export interface TaskList {
+  id: string,
+  name: string,
+  description: string,
+  status: string,
+  responsibility: string,
+  createdAt: string
+  by?: string;
+  features?: {
+    document?: boolean
+  }
 }
 
-export interface CompletedTaskList extends TaskList{
+export interface CompletedTaskList extends TaskList {
 }
 

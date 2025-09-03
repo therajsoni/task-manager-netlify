@@ -72,7 +72,13 @@ const ProjectSchema = new mongoose.Schema(
             required: false,
             ref: "RegisterUsers"
         },
-        attachments: [AttachmentSchema]
+        attachments: [AttachmentSchema],
+        features: {
+            document: {
+                type: String,
+                default: false
+            }
+        }
     },
     { timestamps: true }
 );

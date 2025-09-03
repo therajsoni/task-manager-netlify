@@ -5,6 +5,8 @@ import { Toaster } from "react-hot-toast";
 import { PercentageProvider } from "@/utils/statusContext/projectStatusContext";
 import { RoleProvider } from "@/utils/roleProviderContext";
 import { WorkSpaceProvider } from "@/components/WorkSpaceProvider";
+import { FeatureProvider } from "@/utils/FeaturesContext";
+import { RefreshDataProvider } from "@/utils/RefreshDbs";
 // import { SocketIOProvider } from "@/utils/socket/socketIoProvider";
 
 const geistSans = Geist({
@@ -21,8 +23,8 @@ export const metadata: Metadata = {
   title: "Pmanager",
   description: "project - manager",
   icons: {
-    icon:`./project-aon-logo.png`,
-  }
+    icon: `./project-aon-logo.png`,
+  },
 };
 
 export default function RootLayout({
@@ -37,11 +39,15 @@ export default function RootLayout({
       >
         <PercentageProvider>
           <WorkSpaceProvider>
-          <RoleProvider>
-        {/* <SocketIOProvider> */}
-        {children}
-        {/* </SocketIOProvider> */}
-          </RoleProvider>
+            <RoleProvider>
+              <FeatureProvider>
+                <RefreshDataProvider>
+                  {/* <SocketIOProvider> */}
+                  {children}
+                </RefreshDataProvider>
+              </FeatureProvider>
+              {/* </SocketIOProvider> */}
+            </RoleProvider>
           </WorkSpaceProvider>
         </PercentageProvider>
         <Toaster />
