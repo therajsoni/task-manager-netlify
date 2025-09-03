@@ -156,7 +156,9 @@ export default function TaskTable({
     setOpenModal(false);
   };
   const { addTaskDBRefreshDB } = useRefreshDBProvider();
-  const [renderFeatures, setRenderFeatures] = useState<{}>({});
+  const [renderFeatures, setRenderFeatures] = useState<
+    Record<string, string | boolean>
+  >({});
   const { FitRefreshDb, setFitRefreshDb } = useFeatureProvider();
   const key = tasks[0]?.id + "#$#" + selectedTask?.id;
   const handleFeatures = async () => {
@@ -175,7 +177,7 @@ export default function TaskTable({
       console.log(response, "Response");
       if (request.ok && response.success) {
         const dataResponse = response?.data;
-        let objBody = {};
+        const objBody: Record<string, string | boolean> = {};
         console.log(objBody, "----OBJECTBODY----");
 
         dataResponse?.features?.map(

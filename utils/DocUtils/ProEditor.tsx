@@ -195,7 +195,7 @@ function App({
               )}
             </TooltipTrigger>
           </Tooltip>
-          <X onClick={() => setOpen(false)} />
+          <X onClick={() => setOpen(false)} className="mr-2" size={32} />
         </div>
         <MDEditor
           onChange={(newValue = "") => {

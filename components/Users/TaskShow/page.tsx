@@ -39,7 +39,7 @@ export default function TaskShowSingleUser({
   ) {
     taskData = undefined;
   }
-  const { setKeyDefine, setHitGetShowingFeature } = useFeatureProvider();
+  const { setKeyDefine } = useFeatureProvider();
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [propsData, setPropsData] = useState<ProjectResponse>();
@@ -115,9 +115,9 @@ export default function TaskShowSingleUser({
     }
   }, [loginrole, UserGlobalData, projectData?.name]);
   const [renderFeatures, setRenderFeatures] = useState({});
-  const [featureEditor, setFeatureEditor] = useState<Map<string, any>>(
-    new Map()
-  );
+  const [featureEditor, setFeatureEditor] = useState<
+    Map<string, Record<string, string | boolean>>
+  >(new Map());
   const utilFunctionForAllTaskEditor = async () => {
     const promises = currentTasks
       ?.filter((item) => item?.name !== projectData?.name)
@@ -147,13 +147,15 @@ export default function TaskShowSingleUser({
     console.log(response, "Response");
     if (request.ok && response.success) {
       const dataResponse = response?.data;
-      let objBody = {};
+      const objBody: Record<string, string | boolean> = {};
+
       console.log(objBody, "----OBJECTBODY----");
 
       dataResponse?.features?.map(
-        (d: { key: string; value: string; data: string }) => {
-          console.log(d, "d");
-          objBody[d.key] = d.value;
+        (d: { key: string; value: boolean; data: string }) => {
+          // console.log(d, "d");
+          // objBody[d.key] = d.value;
+          objBody[d.key] = d.value === true; // normalize to boolean
         }
       );
       setRenderFeatures(objBody);

@@ -29,7 +29,16 @@ export default function AlertPage({
   setStateAlert: Dispatch<SetStateAction<boolean>>;
   projectDeatils: singleProjectType | undefined;
 }) {
-  const [selectedAlert, setSelectedAlert] = useState<any | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<{
+    text: {
+      title: string;
+      description: string;
+    };
+    createdAt: Date;
+    sender: {
+      username: string | null;
+    };
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState<
     {
@@ -133,7 +142,7 @@ export default function AlertPage({
       {/* Main Alert Dialog */}
       <Dialog open={stateAlert} onOpenChange={setStateAlert}>
         <DialogContent className="sm:max-w-lg">
-          <DialogTitle>Create Alert's & Review</DialogTitle>
+          <DialogTitle>{"Create Alert's & Review"}</DialogTitle>
 
           {/* Form */}
           <div className="flex flex-col gap-4 w-full max-w-md">
@@ -176,7 +185,7 @@ export default function AlertPage({
 
           {/* Alerts List Header */}
           <div className="flex items-center justify-between gap-4 mt-6">
-            <p className="text-lg font-bold">List of Alert's</p>
+            <p className="text-lg font-bold">{"List of Alert's"}</p>
           </div>
 
           {/* Alerts List */}
@@ -224,7 +233,7 @@ export default function AlertPage({
                 </p>
               </Label>
               <p className="mt-4 text-sm text-gray-500">
-                Created by: {selectedAlert?.sender}
+                Created by: {selectedAlert?.sender?.username}
               </p>
               <p className="text-xs text-gray-400">
                 {dayjs(selectedAlert?.createdAt).format("DD/MM/YYYY HH:mm")}

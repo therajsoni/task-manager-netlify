@@ -26,7 +26,10 @@ export default function DictinaryFeatures({
   setOpen: Dispatch<SetStateAction<boolean>>;
   projectDeatail?: singleProjectType | undefined;
 }) {
-  const [dictonaryConfig, setDictonaryConfig] = useState<{}>({});
+  const [dictonaryConfig, setDictonaryConfig] = useState<
+    Record<string, boolean>
+  >({});
+
   const [status, setStatus] = useState<string | null>(null);
   const key =
     tasks !== undefined && tasks !== null
@@ -36,44 +39,46 @@ export default function DictinaryFeatures({
       : "";
   //   const { getShowingFeatures, postUpdateTaskFeatures } = useFeatureProvider();
   useEffect(() => {
-    const getShowingFeatures = async (key: string) => {
-      const request = await fetch("/api/projectFeature", {
-        method: "POST",
-        body: JSON.stringify({
-          key: key,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const response = await request.json();
-      if (response.status == "403") {
-        setStatus("403");
-      }
-      if (response.success) {
-        const dataResponse = response?.data;
-        let objBody = {};
-        dataResponse?.features?.map(
-          (d: { key: string; value: string; data: string }) => {
-            console.log(d, "d");
-            objBody[d.key] = d.value;
-          }
-        );
-        setDictonaryConfig(objBody);
+    if (!open || !key) return; // only run when dialog opens AND key is valid
+
+    const getShowingFeatures = async () => {
+      try {
+        const request = await fetch("/api/projectFeature", {
+          method: "POST",
+          body: JSON.stringify({ key }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const response = await request.json();
+
+        if (response.status === "403") {
+          setStatus("403");
+          return;
+        }
+
+        if (response.success) {
+          const objBody: Record<string, boolean> = {};
+          response?.data?.features?.forEach(
+            (d: { key: string; value: boolean }) => {
+              objBody[d.key] = d.value;
+            }
+          );
+          setDictonaryConfig(objBody);
+        }
+      } catch (err) {
+        console.error("Error fetching features:", err);
       }
     };
-    getShowingFeatures(key);
-  }, [open]);
+
+    getShowingFeatures();
+  }, [open, key]); // depend also on key
+
   const { FitRefreshDb, setFitRefreshDb } = useFeatureProvider();
   const postUpdateTaskFeatures = async (
     key: string,
-    features: [
-      {
-        key: String;
-        value: String;
-        data: String;
-      }
-    ]
+    features: { key: string; value: boolean; data: string | null }[]
   ) => {
     const request = await fetch("/api/projectFeature/post", {
       method: "POST",
@@ -124,8 +129,7 @@ export default function DictinaryFeatures({
                       <Checkbox
                         checked={dictonaryConfig[key] === true} // ensure boolean
                         onCheckedChange={(checked) => {
-                          const isChecked =
-                            checked === true || checked === "checked";
+                          const isChecked = checked === true;
 
                           setDictonaryConfig((prev) => ({
                             ...prev,

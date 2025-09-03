@@ -50,12 +50,9 @@ export const FeatureProvider = ({ children }: { children: ReactNode }) => {
     console.log(response, "Response");
     if (request.ok && response.success) {
       const dataResponse = response?.data;
-      let objBody = {};
-      console.log(objBody, "----OBJECTBODY----");
-
-      dataResponse?.features?.map(
-        (d: { key: string; value: string; data: string }) => {
-          console.log(d, "d");
+      const objBody: Record<string, boolean> = {};
+      response?.data?.features?.forEach(
+        (d: { key: string; value: boolean }) => {
           objBody[d.key] = d.value;
         }
       );

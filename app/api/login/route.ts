@@ -3,8 +3,9 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request?.json();
-    let { username, password } = body;
-    if (!username || !password) {
+    let { username } = body;
+    const { password } = body
+    if (!username || password) {
       return NextResponse.json({
         message: "Username and password are required",
         status: 400,
